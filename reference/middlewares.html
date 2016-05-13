@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
+
+    <link href="http://sbootstrap-freelancer.startbootstrapc.netdna-cdn.com/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css"/>
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+  </head>
+  <body id="page-top">
+    <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
+      <div class="container">
+        <div class="navbar-header page-scroll">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">enkan</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="hidden active"><a href="#page-top"></a></li>
+            <li class="page-scroll">
+              <a href="getting-started.html">Docs</a>
+            </li>
+            <li>
+              <a href="https://github.com/kawasima/enkan">GitHub</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  <div class="container">
+  <div class="row">
+    <section class="col-lg-3">
+<div id="sidebar-wrapper">
+  <h3>Quick Start</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../getting-started.html">
+        Getting Started
+      </a>
+    </li>
+  </ul>
+
+  <h3>Guide</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../guide/why-enkan.html">
+        Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/enkan-system.html">
+        Enkan system
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/application-factory.html">
+        Application factory
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/controller.html">
+        Controller
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/content-negotiation.html">
+        Content negotiation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/session.html">
+        Session
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/conversation.html">
+        Conversation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/authentication.html">
+        Authentication
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/file-uploading.html">
+        File uploading
+      </a>
+    </li>
+  </ul>
+
+  <h3>Reference</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../reference/middlewares.html">Middleware</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/components.html">Components</a>
+    </li>
+  </ul>
+</div>
+    </section>
+    <section class="col-lg-9">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+          <h1><a href="#middleware-catalog" name="middleware-catalog">Middleware catalog</a></h1><h2><a href="#core" name="core">Core</a></h2><p>enkan-core package has middlewares as follows:</p><h3><a href="#authentication" name="authentication">Authentication</a></h3><p>AuthenticationMiddleware enables to authenticate a request using some backends.</p><h4><a href="#properties" name="properties">Properties</a></h4>
+<table>
+  <thead>
+    <tr>
+      <th align="left">Name</th>
+      <th align="left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="left">backends</td>
+      <td align="left">The list of authentication backends.</td>
+    </tr>
+  </tbody>
+</table><h4><a href="#usage" name="usage">Usage</a></h4>
+<pre><code class="language-java">app.use(new AuthenticateMiddleware(backends));
+</code></pre><h3><a href="#serviceunavailable" name="serviceunavailable">ServiceUnavailable</a></h3><h4><a href="#usage" name="usage">Usage</a></h4>
+<pre><code class="language-java">app.use(new ServiceUnavailableMiddleware(serviceUnavailableEndpoint));
+</code></pre><h4><a href="#properties" name="properties">Properties</a></h4>
+<table>
+  <thead>
+    <tr>
+      <th align="left">Name </th>
+      <th align="left">Type </th>
+      <th align="left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="left">endpoint</td>
+      <td align="left">Endpoint</td>
+      <td align="left">Returns the response when service is unavailable.</td>
+    </tr>
+  </tbody>
+</table><h2><a href="#web" name="web">Web</a></h2><p>enkan-web package has middlewares as follows:</p><h3><a href="#absoluteredirects" name="absoluteredirects">AbsoluteRedirects</a></h3><p><code>AbsoluteRedirectsMiddleware</code> rewrites the URL contains <code>Location</code> http response header to the absolute URL.</p>
+<pre><code>Location: /abc/123
+    ↓
+Location: http://myhost/abc/123
+</code></pre><h4><a href="#usage" name="usage">Usage</a></h4>
+<pre><code class="language-java">app.use(new AbsoluteRedirectsMiddleware());
+</code></pre><h4><a href="#properties" name="properties">Properties</a></h4><p>AbsoluteRedirectsMiddleware has no properties.</p><h3><a href="#antiforgery" name="antiforgery">AntiForgery</a></h3><p><code>AntiForgeryMiddleware</code> appends the token check for protecting from the CSRF attack.<br/>When the request method isn&rsquo;t GET/HEAD/OPTIONS, AntiForgeryMiddleware validates the given token.<br/>If the token is invalid, it returns the forbidden response.</p><p>Because <code>AntiForgeryMiddleware</code> requires Session, We recommend using <code>Conversation</code> instead of this.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+<pre><code class="language-java">app.use(new AntiForgeryMiddleware());
+</code></pre><h4><a href="#properties" name="properties">Properties</a></h4><p>AntiForgeryMiddleware has no properties.</p><h3><a href="#contentnegotiation" name="contentnegotiation">ContentNegotiation</a></h3><h3><a href="#contenttype" name="contenttype">ContentType</a></h3><h3><a href="#contenttypeoptions" name="contenttypeoptions">ContentTypeOptions</a></h3><h3><a href="#conversation" name="conversation">Conversation</a></h3><h3><a href="#cookies" name="cookies">Cookies</a></h3><h3><a href="#defaultcharset" name="defaultcharset">DefaultCharset</a></h3><h3><a href="#flash" name="flash">Flash</a></h3><h3><a href="#frameoptions" name="frameoptions">FrameOptions</a></h3><h3><a href="#idlesessiontimeout" name="idlesessiontimeout">IdleSessionTimeout</a></h3><p>Enkan Session has no expires in default. This middleware append the feature of timeout to the session.</p><h3><a href="#methodoverride" name="methodoverride">MethodOverride</a></h3><h3><a href="#multipartparams" name="multipartparams">MultipartParams</a></h3><h3><a href="#nestedparams" name="nestedparams">NestedParams</a></h3><p>NestedParamsMiddleware enables to parse nested parameters like <code>foo[][bar]</code>. It requires ParamMiddleware.</p><h3><a href="#normalization" name="normalization">Normalization</a></h3><h3><a href="#params" name="params">Params</a></h3><p>ParamMiddleware enables to parse urlencoded query string and post body and set to a request object. </p><h4><a href="#usage" name="usage">Usage</a></h4>
+<pre><code class="language-java">app.use(new ParamsMiddleware());
+</code></pre><h3><a href="#resources" name="resources">Resources</a></h3><h3><a href="#session" name="session">Session</a></h3><p>SessionMiddleware enables to store/load session objects to/from in-memory or JCache.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+<pre><code class="language-java">app.use(new SessionMiddleware());
+</code></pre><h4><a href="#properties" name="properties">Properties</a></h4>
+<table>
+  <thead>
+    <tr>
+      <th align="left">Name</th>
+      <th align="left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="left">cookieName</td>
+      <td align="left">A name of cookie for session id. Default value is <code>enkan-session</code></td>
+    </tr>
+    <tr>
+      <td align="left">store</td>
+      <td align="left">A storage for session.</td>
+    </tr>
+  </tbody>
+</table><h3><a href="#trace" name="trace">Trace</a></h3><h3><a href="#xssprotection" name="xssprotection">XssProtection</a></h3><h2><a href="#kotowari" name="kotowari">Kotowari</a></h2><h3><a href="#controllerinvoker" name="controllerinvoker">ControllerInvoker</a></h3><h3><a href="#form" name="form">Form</a></h3><h3><a href="#rendertemplate" name="rendertemplate">RenderTemplate</a></h3><h3><a href="#routing" name="routing">Routing</a></h3><h3><a href="#serdes" name="serdes">SerDes</a></h3><h3><a href="#transaction" name="transaction">Transaction</a></h3><h3><a href="#validateform" name="validateform">ValidateForm</a></h3>
+          </div>
+        </div>
+      </div>
+    <section>
+  </div>
+  </div>
+    <footer>
+      <div class="container">
+        <div class="col-lg-4">
+
+        </div>
+        <div class="col-lg-4 col-lg-offset-4">
+          © 2016 kawasima<br/>
+          Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+        </div>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+  </body>
+</html>

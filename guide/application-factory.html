@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
+
+    <link href="http://sbootstrap-freelancer.startbootstrapc.netdna-cdn.com/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css"/>
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+  </head>
+  <body id="page-top">
+    <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
+      <div class="container">
+        <div class="navbar-header page-scroll">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">enkan</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="hidden active"><a href="#page-top"></a></li>
+            <li class="page-scroll">
+              <a href="getting-started.html">Docs</a>
+            </li>
+            <li>
+              <a href="https://github.com/kawasima/enkan">GitHub</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  <div class="container">
+  <div class="row">
+    <section class="col-lg-3">
+<div id="sidebar-wrapper">
+  <h3>Quick Start</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../getting-started.html">
+        Getting Started
+      </a>
+    </li>
+  </ul>
+
+  <h3>Guide</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../guide/why-enkan.html">
+        Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/enkan-system.html">
+        Enkan system
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/application-factory.html">
+        Application factory
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/controller.html">
+        Controller
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/content-negotiation.html">
+        Content negotiation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/session.html">
+        Session
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/conversation.html">
+        Conversation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/authentication.html">
+        Authentication
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/file-uploading.html">
+        File uploading
+      </a>
+    </li>
+  </ul>
+
+  <h3>Reference</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../reference/middlewares.html">Middleware</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/components.html">Components</a>
+    </li>
+  </ul>
+</div>
+    </section>
+    <section class="col-lg-9">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+          <h1><a href="#application-factory" name="application-factory">Application Factory</a></h1><p>ApplicationFactory is a factory of a web application. Enkan has no configuration files.<br/>So all of the configuration are written in ApplicationFactory.</p><p>In ApplicationFactory routing and using middleware should be described.</p><h2><a href="#routing" name="routing">Routing</a></h2><p>Kotowari&rsquo;s routing has the features like RoR routing. There are recognizing and generating. </p><h3><a href="#defining-routes" name="defining-routes">Defining routes</a></h3><p><code>Routes</code> class has the <code>define</code> method for the mapping between the path and the controller method.</p>
+<pre><code class="language-java">Routes routes = Routes.define(r -&gt; {
+    r.get(&quot;/&quot;).to(HomeController.class, &quot;index&quot;);
+    r.scope(&quot;/admin&quot;, admin -&gt; {
+        admin.resource(UserController.class);
+    });
+}).compile();
+</code></pre><p>In the example above, <code>r</code> is a <code>RoutePatterns</code> class for defining each route.<br/>It provides useful methods as follows:</p>
+<table>
+  <thead>
+    <tr>
+      <th align="left">Method</th>
+      <th align="left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="left">get</td>
+      <td align="left">If HTTP request method is <code>GET</code>, the request is mapped to the given controller method.</td>
+    </tr>
+    <tr>
+      <td align="left">post</td>
+      <td align="left">If HTTP request method is <code>POST</code>, the request is mapped to the given controller method.</td>
+    </tr>
+    <tr>
+      <td align="left">put</td>
+      <td align="left">If HTTP request method is <code>PUT</code>, the request is mapped to the given controller method.</td>
+    </tr>
+    <tr>
+      <td align="left">patch</td>
+      <td align="left">If HTTP request method is <code>PATCH</code>, the request is mapped to the given controller method.</td>
+    </tr>
+    <tr>
+      <td align="left">delete</td>
+      <td align="left">If HTTP request method is <code>DELETE</code>, the request is mapped to the given controller method.</td>
+    </tr>
+    <tr>
+      <td align="left">resource</td>
+      <td align="left">Creating a resourceful route.</td>
+    </tr>
+    <tr>
+      <td align="left">scope</td>
+      <td align="left">Grouping the multiple routes and prepend the path to each sub-routes.</td>
+    </tr>
+  </tbody>
+</table><p><code>resource</code> method will generate routes as follows:</p>
+<table>
+  <thead>
+    <tr>
+      <th align="left">HTTP verb</th>
+      <th align="left">Path </th>
+      <th align="left">Controller method</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="left">GET </td>
+      <td align="left">/ </td>
+      <td align="left">index </td>
+    </tr>
+    <tr>
+      <td align="left">GET </td>
+      <td align="left">/:id </td>
+      <td align="left">show </td>
+    </tr>
+    <tr>
+      <td align="left">GET </td>
+      <td align="left">/new </td>
+      <td align="left">newForm </td>
+    </tr>
+    <tr>
+      <td align="left">POST </td>
+      <td align="left">/ </td>
+      <td align="left">create </td>
+    </tr>
+    <tr>
+      <td align="left">GET </td>
+      <td align="left">/:id/edit </td>
+      <td align="left">edit </td>
+    </tr>
+    <tr>
+      <td align="left">PUT </td>
+      <td align="left">/:id </td>
+      <td align="left">update </td>
+    </tr>
+    <tr>
+      <td align="left">DELETE </td>
+      <td align="left">/:id </td>
+      <td align="left">delete </td>
+    </tr>
+  </tbody>
+</table><p>And <code>scope</code> can be nested.</p>
+<pre><code class="language-java">Routes routes = Routes.define(r -&gt;
+    r.scope(&quot;/admin&quot;, admin -&gt;
+        admin.scope(&quot;/user&quot;, user -&gt;
+            user.get(&quot;/list&quot;).to(AdminUserController.class, &quot;list&quot;)))
+).compile();
+</code></pre><p>Above example routes the <code>/admin/user/list</code> request to the <code>list</code> method of AdminUserController class. </p><h3><a href="#generates-path" name="generates-path">Generates path</a></h3><h2><a href="#middleware" name="middleware">Middleware</a></h2><p>To use and configure the middleware, call <code>use()</code> method in Application.<br/>The middleware executes in the order they are called <code>use()</code>.</p>
+<pre><code class="language-java">    app.use(new DefaultCharsetMiddleware());
+    app.use(new MetricsMiddleware&lt;&gt;());
+    app.use(NONE, new ServiceUnavailableMiddleware&lt;&gt;(new ResourceEndpoint(&quot;/public/html/503.html&quot;)));
+    app.use(envIn(&quot;development&quot;), new StacktraceMiddleware());
+</code></pre>
+          </div>
+        </div>
+      </div>
+    <section>
+  </div>
+  </div>
+    <footer>
+      <div class="container">
+        <div class="col-lg-4">
+
+        </div>
+        <div class="col-lg-4 col-lg-offset-4">
+          © 2016 kawasima<br/>
+          Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+        </div>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+  </body>
+</html>
