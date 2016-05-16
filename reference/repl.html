@@ -116,49 +116,7 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
-          <h1><a href="#controllers" name="controllers">Controllers</a></h1><h2><a href="#component-injection" name="component-injection">Component Injection</a></h2><p>Components that are registered in the Enkan system is injected to an annotated field with <code>Inject</code> of a controller.</p>
-<pre><code class="language-java">public class UserController {
-    @Inject
-    private TemplateEngine templateEngine;
-    
-    @Inject
-    private DomaProvider daoProvider;
-}
-</code></pre><h2><a href="#arguments" name="arguments">Arguments</a></h2><p>Arguments of a controller method are available as follows:</p>
-<ul>
-  <li>Parameters</li>
-  <li>UserPrincipal</li>
-  <li>Session</li>
-  <li>Flash</li>
-  <li>Conversation</li>
-  <li>ConversationState</li>
-  <li>Request body object</li>
-</ul><p>If they are in the controller method parameters, <code>ControllerInvokerMiddleware</code> injects to the arguments.<br/>They are in random order.</p>
-<pre><code class="language-java">public class ArgumentInjectionController {
-    public String method1(Parameters params, UserPrincipal principal, Session session) {
-
-    }
-}
-</code></pre><h3><a href="#parameters" name="parameters">Parameters</a></h3><p><code>Parameters</code> is a map represents a query string and a url encoded form.</p><h3><a href="#userprincipal" name="userprincipal">UserPrincipal</a></h3><p><code>UserPrincipal</code> represents an authenticated user. It is available when <code>AuthenticationMiddleware</code> is used.</p><h3><a href="#session" name="session">Session</a></h3><h3><a href="#flash" name="flash">Flash</a></h3><p>Flash is a short time session.</p><h2><a href="#validation" name="validation">Validation</a></h2><p>Kotowari supports validation of the request body object using JSR 303 Bean validation.</p>
-<pre><code class="language-java">@Data
-@EqualsAndHashCode(callSuper = false)
-public class CustomerForm extends FormBase {
-    @NotBlank
-    @Size(max = 10)
-    private String name;
-
-    @NotBlank
-    private String password;
-
-    @Email
-    private String email;
-
-    @Pattern(regexp = &quot;[MF]&quot;)
-    private String gender;
-
-    private String birthday;
-}
-</code></pre>
+          <h1><a href="#repl-command" name="repl-command">REPL command</a></h1><h2><a href="#core" name="core">Core</a></h2><h3>/connect [port]</h3><p>Connect to a remote Enkan system.</p><h3><a href="#exit" name="exit">/exit</a></h3><p>Disconnect from a remote Enkan system.</p><h3><a href="#start" name="start">/start</a></h3><p>Start the Enkan system.</p><h3><a href="#stop" name="stop">/stop</a></h3><p>Stop the Enkan system.</p><h3><a href="#reset" name="reset">/reset</a></h3><p>Stop and start the Enkan system.</p><h3><a href="#shutdown" name="shutdown">/shutdown</a></h3><p>Shutdown the Enkan system.</p><h3>/middleware [app] list</h3><p>Show the list of middlewares.</p><h2><a href="#devel" name="devel">Devel</a></h2><h3><a href="#autoreset" name="autoreset">/autoreset</a></h3><p>Reset automatically when a class has changed.</p><h3><a href="#compile" name="compile">/compile</a></h3><p>Compile source codes using maven.</p>
           </div>
         </div>
       </div>

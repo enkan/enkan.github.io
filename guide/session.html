@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
 
     <link href="http://sbootstrap-freelancer.startbootstrapc.netdna-cdn.com/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css"/>
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
     <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
@@ -108,6 +106,9 @@
     <li class="sidebar-brand">
       <a href="../reference/components.html">Components</a>
     </li>
+    <li class="sidebar-brand">
+      <a href="../reference/repl.html">REPL commands</a>
+    </li>
   </ul>
 </div>
     </section>
@@ -117,10 +118,17 @@
           <div class="col-lg-12">
           <h1><a href="#sessions" name="sessions">Sessions</a></h1><p>You can use <code>session</code> same in Servlet. But Enkan&rsquo;s session doesn&rsquo;t depend on HttpSession.<br/>There is a big difference.</p><p>In Enkan, both of the request and the response have the session properties.</p>
 <pre><code class="language-java">public HttpResponse wrongUsage(Session session) {
-    session.put(&quot;new&quot;, &quot;aaa&quot;);
+    session.put(&quot;newProp&quot;, &quot;aaa&quot;);
     return HttpResponse.of(&quot;response&quot;);
 }
-</code></pre><p>In the above case, <code>new</code> property doesn&rsquo;t be saved.</p>
+</code></pre><p>In the above case, <code>newProp</code> property doesn&rsquo;t be saved.</p><p>Correct code as follows:</p>
+<pre><code class="language-java">public HttpResponse wrongUsage(Session session) {
+    session.put(&quot;newProp&quot;, &quot;aaa&quot;);
+    return builder(HttpResponse.of(&quot;response&quot;))
+        .set(HttpResponse::setSession, session)
+        .builder();
+}
+</code></pre>
           </div>
         </div>
       </div>

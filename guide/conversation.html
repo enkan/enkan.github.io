@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
 
     <link href="http://sbootstrap-freelancer.startbootstrapc.netdna-cdn.com/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css"/>
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
     <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
@@ -108,6 +106,9 @@
     <li class="sidebar-brand">
       <a href="../reference/components.html">Components</a>
     </li>
+    <li class="sidebar-brand">
+      <a href="../reference/repl.html">REPL commands</a>
+    </li>
   </ul>
 </div>
     </section>
@@ -115,7 +116,30 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
-          <h1><a href="#conversations" name="conversations">Conversations</a></h1><p>Enkan supports the Java EE Conversation scope.</p>
+          <h1><a href="#conversations" name="conversations">Conversations</a></h1><p>Enkan supports the pseudo Java EE Conversation scope.</p><h2><a href="#conversation" name="conversation">Conversation</a></h2><p><code>Conversation</code> gives an unique id to the series of long transactional requests.</p><p>If you start a conversation, describe as follows.</p>
+<pre><code class="language-java">HttpResponse startConversation(Conversation conversation) {
+    if (conversation.isTransient()) conversation.begin();
+}
+</code></pre><p>And if you end a conversation, describe as follows. </p>
+<pre><code class="language-java">HttpResponse endConversation(Conversation conversation) {
+    if (!conversation.isTransient()) conversation.end();
+    
+    // Transaction code...
+}
+</code></pre><p>A conversation send to the server via HTTP parameters. So, you need to write the following code in each form. </p>
+<pre><code class="language-html">&lt;input type=&quot;hidden&quot; name=&quot;__converstation-id&quot; value=&quot;${conversationId}&quot;/&gt;
+</code></pre><h2><a href="#conversation-state" name="conversation-state">Conversation state</a></h2><p>A <code>ConversationState</code> can have pairs of key and value related with conversation.<br/>If conversation ends, conversation state will be deleted. </p>
+<pre><code class="language-java">HttpResponse conversation(Conversation conversation) {
+    if (conversation.isTransient()) conversation.begin();
+    
+    ConversationState conversationState = new ConversationState();
+    conversationState.put(&quot;random&quot;, randomValue);
+    
+    return builder(templateEngine.render(&quot;template&quot;))
+            .set(HttpResponse::setConversationState, conversationState)
+            .build();
+}
+</code></pre><p>In above code, conversation state will be stored to the KVS store in the same case of Session.</p>
           </div>
         </div>
       </div>

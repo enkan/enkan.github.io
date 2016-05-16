@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
 
     <link href="http://sbootstrap-freelancer.startbootstrapc.netdna-cdn.com/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css"/>
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
     <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
@@ -108,6 +106,9 @@
     <li class="sidebar-brand">
       <a href="../reference/components.html">Components</a>
     </li>
+    <li class="sidebar-brand">
+      <a href="../reference/repl.html">REPL commands</a>
+    </li>
   </ul>
 </div>
     </section>
@@ -145,7 +146,19 @@ private TemplateEngine freemarker;
 @Named(&quot;thymeleaf&quot;)
 @Inject
 private TemplateEngine freemarker;
-</code></pre>
+</code></pre><h2><a href="#bootstrap-the-enkan-system" name="bootstrap-the-enkan-system">Bootstrap the Enkan system</a></h2><p>To start/stop the Enkan system, call the <code>start()</code> or <code>stop()</code> method.</p>
+<pre><code class="language-java">system.start();
+
+// ...
+
+system.stop();
+</code></pre><p>It is better to bootstrap a system in the REPL for the operation.</p>
+<pre><code class="language-java">PseudoRepl repl = new PseudoRepl(MyExampleSystemFactory.class.getName());
+ReplBoot.start(repl,
+        new KotowariCommandRegister(),
+        new DevelCommandRegister(),
+        new MetricsCommandRegister());
+</code></pre><p><code>PseudoRepl</code> is a REPL server. The factory class for Enkan system.<br/><code>ReplBoot</code> is a tool for starting the REPL server and registering some commands to the REPL at same time.</p>
           </div>
         </div>
       </div>

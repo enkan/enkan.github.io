@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
 
     <link href="http://sbootstrap-freelancer.startbootstrapc.netdna-cdn.com/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css"/>
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
     <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
@@ -107,6 +105,9 @@
     </li>
     <li class="sidebar-brand">
       <a href="../reference/components.html">Components</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/repl.html">REPL commands</a>
     </li>
   </ul>
 </div>
@@ -212,12 +213,57 @@
         admin.scope(&quot;/user&quot;, user -&gt;
             user.get(&quot;/list&quot;).to(AdminUserController.class, &quot;list&quot;)))
 ).compile();
-</code></pre><p>Above example routes the <code>/admin/user/list</code> request to the <code>list</code> method of AdminUserController class. </p><h3><a href="#generates-path" name="generates-path">Generates path</a></h3><h2><a href="#middleware" name="middleware">Middleware</a></h2><p>To use and configure the middleware, call <code>use()</code> method in Application.<br/>The middleware executes in the order they are called <code>use()</code>.</p>
+</code></pre><p>Above example routes the <code>/admin/user/list</code> request to the <code>list</code> method of AdminUserController class. </p><h3><a href="#generates-path" name="generates-path">Generates path</a></h3><p><code>UrlRewriter#urlFor</code> methods can generate the path string from the given parameters.</p>
+<pre><code class="language-java">Routes routes = Routes.define(r -&gt; {
+    r.get(&quot;/a/b/&quot;).to(TestController.class, &quot;index&quot;);
+    r.get(&quot;/a/b/:id&quot;).to(TestController.class, &quot;show&quot;);
+}).compile();
+
+// Generates &quot;/a/b/&quot;
+routes.generate(OptionMap.of(&quot;controller&quot;, TestController.class, &quot;action&quot;, &quot;index&quot;));
+
+// Generates &quot;/a/b/1&quot;
+routes.generate(OptionMap.of(&quot;controller&quot;, TestController.class, &quot;action&quot;, &quot;show&quot;, &quot;id&quot;, 1));
+</code></pre><h2><a href="#middleware" name="middleware">Middleware</a></h2><p>To use and configure the middleware, call <code>use()</code> method in Application.<br/>The middleware executes in the order they are called <code>use()</code>.</p>
 <pre><code class="language-java">    app.use(new DefaultCharsetMiddleware());
     app.use(new MetricsMiddleware&lt;&gt;());
     app.use(NONE, new ServiceUnavailableMiddleware&lt;&gt;(new ResourceEndpoint(&quot;/public/html/503.html&quot;)));
     app.use(envIn(&quot;development&quot;), new StacktraceMiddleware());
-</code></pre>
+</code></pre><h3><a href="#predicates" name="predicates">Predicates</a></h3><p>If the <code>use</code> method takes two arguments, its first argument is a <code>Predicate</code>.<br/><code>Predicate</code> is a condition whether or not the middleware is applied.</p><p>Standard predicates as follows:</p>
+<table>
+  <thead>
+    <tr>
+      <th align="left">Type </th>
+      <th align="left">Description </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="left">NonePredicate </td>
+      <td align="left">Not applied to all requests</td>
+    </tr>
+    <tr>
+      <td align="left">AnyPredicate </td>
+      <td align="left">Applied to all requests</td>
+    </tr>
+    <tr>
+      <td align="left">PathPredicate </td>
+      <td align="left">Applied to a request that matches the given path pattern and request method</td>
+    </tr>
+    <tr>
+      <td align="left">AuthenticatedPredicate </td>
+      <td align="left">Applied to a request that has valid <code>UserPrincipal</code> </td>
+    </tr>
+    <tr>
+      <td align="left">PermissionPredicate </td>
+      <td align="left">Applied to a request that its <code>UserPrincipal</code> contains the given permissions</td>
+    </tr>
+    <tr>
+      <td align="left">EnvPredicate </td>
+      <td align="left">Applied to a request that the given environment matches the <code>ENKAN_ENV</code> environment variable.</td>
+    </tr>
+  </tbody>
+</table>
           </div>
         </div>
       </div>
