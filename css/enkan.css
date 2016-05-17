@@ -6,11 +6,6 @@
 body {
   font-family: "Tenderness", "Helvetica Neue", Helvetica, Arial, sans-serif;
   overflow-x: hidden;
-}
-p {
-  font-size: 20px;
-}
-p.small {
   font-size: 16px;
 }
 a,
@@ -186,6 +181,8 @@ section h6 {
 }
 section h2 {
   font-size: 2em;
+}
+section:not(.top) h2 {
   border-bottom: 1px solid #ea5f81;
   width: 100%;
 }

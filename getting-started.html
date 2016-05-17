@@ -121,7 +121,7 @@
   <li>Java 1.8 or higher</li>
   <li>Maven3</li>
 </ul><h2><a href="#maven-archetype" name="maven-archetype">Maven archetype</a></h2><p>You can create an Enkan&rsquo;s blank project from maven archetype. </p>
-<pre><code class="language bash">% mvn archetype:generate -DarchetypeGroupId=net.unit8.enkan -DarchetypeArtifactId=kotowari-archetype -DarchetypeVersion=0.1.0
+<pre><code class="language bash">% mvn archetype:generate -DarchetypeGroupId=net.unit8.enkan -DarchetypeArtifactId=kotowari-archetype -DarchetypeVersion=0.1.0-beta1
 </code></pre><p>By default, following components is enabled.</p>
 <ul>
   <li>undertow</li>
@@ -133,7 +133,7 @@
 </ul><h2><a href="#start-repl" name="start-repl">Start REPL</a></h2>
 <pre><code class="language-bash">% mvn -e compile exec:java
 </code></pre><h2><a href="#scaffolding" name="scaffolding">Scaffolding</a></h2><p><code>enkan-devel</code> is a useful tool in development. it contains the command to generate an application scaffold.</p><h3><a href="#create-table" name="create-table">Create table</a></h3>
-<pre><code class="language-bash">enkan&gt; /generate table PRODUCT (id bigint primary key, name varchar(255))
+<pre><code class="language-bash">enkan&gt; /generate table PRODUCT (id identity primary key, name varchar(255))
 </code></pre><p>If automatic building is unavailable, the <code>/compile</code> command is useful. </p>
 <pre><code class="language-bash">enkan&gt; /compile
 </code></pre><p>When you reset your application, Flyway component will execute the generated migration. </p>
