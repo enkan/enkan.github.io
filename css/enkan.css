@@ -113,7 +113,6 @@ header .intro-text .skills {
 }
 @media (min-width: 768px) {
   .navbar-fixed-top {
-    background-color: #110a46;
     padding: 25px 0;
     -webkit-transition: padding 0.3s;
     -moz-transition: padding 0.3s;
@@ -152,9 +151,9 @@ header .intro-text .skills {
   color: #fcda8f;
   outline: none;
 }
-.navbar-default,
-.navbar-inverse {
+.navbar-default {
   border: none;
+  background-color: #110a46;
 }
 ul.sidebar-nav {
   padding-left: 0;
@@ -200,7 +199,7 @@ section.success a.active {
 }
 @media (max-width: 767px) {
   section {
-    padding: 75px 0;
+    padding: 15px 0;
   }
   section.first {
     padding-top: 75px;
