@@ -121,7 +121,7 @@
   <li>Java 1.8 or higher</li>
   <li>Maven3</li>
 </ul><h2><a href="#maven-archetype" name="maven-archetype">Maven archetype</a></h2><p>You can create an Enkan&rsquo;s blank project from maven archetype. </p>
-<pre><code class="language bash">% mvn archetype:generate -DarchetypeGroupId=net.unit8.enkan -DarchetypeArtifactId=kotowari-archetype -DarchetypeVersion=0.1.0-beta1
+<pre><code class="language bash">% mvn archetype:generate -DarchetypeGroupId=net.unit8.enkan -DarchetypeArtifactId=kotowari-archetype -DarchetypeVersion=0.1.0-beta2
 </code></pre><p>By default, following components is enabled.</p>
 <ul>
   <li>undertow</li>
@@ -144,9 +144,7 @@
 <pre><code class="language-bash">enkan&gt; /generate crud PRODUCT
 </code></pre><p>If necessary, compile it.</p>
 <pre><code class="language-bash">enkan&gt; /compile
-</code></pre>
-<blockquote><p>In 0.1.0-beta1, a compile error will occur. Please remove an unneeded generics diamond operator.</p>
-</blockquote><p>When you reset your application, the generated routes are reloaded and become available. </p>
+</code></pre><p>When you reset your application, the generated routes are reloaded and become available. </p>
 <pre><code class="language-bash">enkan&gt; /reset
 </code></pre><p>Try to access <a href="http://localhost:3000/product"><code>http://localhost:3000/product</code></a> in your browser.</p>
           </div>
