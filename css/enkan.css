@@ -122,7 +122,7 @@ header .intro-text .skills {
     height: 64px;
     padding-left: 80px;
     color: #bcd7ed;
-    background: url(../img/logo.png) no-repeat left center;
+    background: url(../img/logo.svg) no-repeat left center;
     font-size: 2em;
   }
   .navbar-fixed-top.navbar-shrink {
@@ -150,6 +150,9 @@ header .intro-text .skills {
 .navbar .navbar-nav li a:focus {
   color: #fcda8f;
   outline: none;
+}
+.navbar .navbar-header .navbar-brand {
+  line-height: 100%;
 }
 .navbar-default {
   border: none;

@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset=utf-8"/>
+    <title>Middleware catalog | Enkan</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
@@ -9,7 +10,7 @@
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
 
-    <link href="http://sbootstrap-freelancer.startbootstrapc.netdna-cdn.com/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
     <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
@@ -187,7 +188,7 @@ Location: http://myhost/abc/123
 </code></pre><h3><a href="#params" name="params">Params</a></h3><p>ParamMiddleware enables to parse urlencoded query string and post body and set to a request object. </p><h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new ParamsMiddleware());
 </code></pre><h3><a href="#resources" name="resources">Resources</a></h3><p>Returns the asset file that is searched from classpath.</p><h4><a href="#usage" name="usage">Usage</a></h4>
-<pre><code class="language-java">app.use(new ResourcesMiddleware());
+<pre><code class="language-java">app.use(new ResourceMiddleware());
 </code></pre><h4><a href="#properties" name="properties">Properties</a></h4>
 <table>
   <thead>
