@@ -6,15 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" type="text/css"/>
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.css" type="text/css"/>
 
-    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
     <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
       <div class="container">
+
         <div class="navbar-header page-scroll">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
             <span class="sr-only">Toggle navigation</span>
@@ -117,7 +118,12 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
-          <h1><a href="#middleware-catalog" name="middleware-catalog">Middleware catalog</a></h1><h2><a href="#core" name="core">Core</a></h2><p>enkan-core package has middlewares as follows:</p><h3><a href="#authentication" name="authentication">Authentication</a></h3><p>AuthenticationMiddleware enables to authenticate a request using some backends.</p><h4><a href="#properties" name="properties">Properties</a></h4>
+          <h1><a href="#middleware-catalog" name="middleware-catalog">Middleware catalog</a></h1>
+<h2><a href="#core" name="core">Core</a></h2>
+<p>enkan-core package has middlewares as follows:</p>
+<h3><a href="#authentication" name="authentication">Authentication</a></h3>
+<p>AuthenticationMiddleware enables to authenticate a request using some backends.</p>
+<h4><a href="#properties" name="properties">Properties</a></h4>
 <table>
   <thead>
     <tr>
@@ -131,11 +137,15 @@
       <td align="left">The list of authentication backends.</td>
     </tr>
   </tbody>
-</table><h4><a href="#usage" name="usage">Usage</a></h4>
+</table>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new AuthenticateMiddleware(backends));
-</code></pre><h3><a href="#serviceunavailable" name="serviceunavailable">ServiceUnavailable</a></h3><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#serviceunavailable" name="serviceunavailable">ServiceUnavailable</a></h3>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new ServiceUnavailableMiddleware(serviceUnavailableEndpoint));
-</code></pre><h4><a href="#properties" name="properties">Properties</a></h4>
+</code></pre>
+<h4><a href="#properties" name="properties">Properties</a></h4>
 <table>
   <thead>
     <tr>
@@ -151,45 +161,104 @@
       <td align="left">Returns the response when service is unavailable.</td>
     </tr>
   </tbody>
-</table><h2><a href="#web" name="web">Web</a></h2><p>enkan-web package has middlewares as follows:</p><h3><a href="#absoluteredirects" name="absoluteredirects">AbsoluteRedirects</a></h3><p><code>AbsoluteRedirectsMiddleware</code> rewrites the URL contains <code>Location</code> http response header to the absolute URL.</p>
+</table>
+<h2><a href="#web" name="web">Web</a></h2>
+<p>enkan-web package has middlewares as follows:</p>
+<h3><a href="#absoluteredirects" name="absoluteredirects">AbsoluteRedirects</a></h3>
+<p><code>AbsoluteRedirectsMiddleware</code> rewrites the URL contains <code>Location</code> http response header to the absolute URL.</p>
 <pre><code>Location: /abc/123
     ↓
 Location: http://myhost/abc/123
-</code></pre><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new AbsoluteRedirectsMiddleware());
-</code></pre><h4><a href="#properties" name="properties">Properties</a></h4><p>AbsoluteRedirectsMiddleware has no properties.</p><h3><a href="#antiforgery" name="antiforgery">AntiForgery</a></h3><p><code>AntiForgeryMiddleware</code> appends the token check for protecting from the CSRF attack.<br/>When the request method isn&rsquo;t GET/HEAD/OPTIONS, AntiForgeryMiddleware validates the given token.<br/>If the token is invalid, it returns the forbidden response.</p><p>Because <code>AntiForgeryMiddleware</code> requires Session, We recommend using <code>Conversation</code> instead of this.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h4><a href="#properties" name="properties">Properties</a></h4>
+<p>AbsoluteRedirectsMiddleware has no properties.</p>
+<h3><a href="#antiforgery" name="antiforgery">AntiForgery</a></h3>
+<p><code>AntiForgeryMiddleware</code> appends the token check for protecting from the CSRF attack.<br/>When the request method isn&rsquo;t GET/HEAD/OPTIONS, AntiForgeryMiddleware validates the given token.<br/>If the token is invalid, it returns the forbidden response.</p>
+<p>Because <code>AntiForgeryMiddleware</code> requires Session, We recommend using <code>Conversation</code> instead of this.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new AntiForgeryMiddleware());
-</code></pre><h4><a href="#properties" name="properties">Properties</a></h4><p>AntiForgeryMiddleware has no properties.</p><h3><a href="#contentnegotiation" name="contentnegotiation">ContentNegotiation</a></h3><p>Parses the <code>Accept</code> header and sets the value to a request.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h4><a href="#properties" name="properties">Properties</a></h4>
+<p>AntiForgeryMiddleware has no properties.</p>
+<h3><a href="#contentnegotiation" name="contentnegotiation">ContentNegotiation</a></h3>
+<p>Parses the <code>Accept</code> header and sets the value to a request.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new ContentNegotiationMiddleware());
-</code></pre><h3><a href="#contenttype" name="contenttype">ContentType</a></h3><p>Adds the <code>Content-Type</code> header if the response does not contains a <code>Content-Type</code> header yet.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#contenttype" name="contenttype">ContentType</a></h3>
+<p>Adds the <code>Content-Type</code> header if the response does not contains a <code>Content-Type</code> header yet.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new ContentTypeMiddleware());
-</code></pre><h3><a href="#contenttypeoptions" name="contenttypeoptions">ContentTypeOptions</a></h3><p>Adds the <code>X-Content-Type-Options</code> for protecting a XSS attack. </p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#contenttypeoptions" name="contenttypeoptions">ContentTypeOptions</a></h3>
+<p>Adds the <code>X-Content-Type-Options</code> for protecting a XSS attack. </p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new ContentTypeOptionsMiddleware());
-</code></pre><h3><a href="#conversation" name="conversation">Conversation</a></h3><p>Creates a conversation and save states related with its conversation to the conversation store.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#conversation" name="conversation">Conversation</a></h3>
+<p>Creates a conversation and save states related with its conversation to the conversation store.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new ConversationMiddleware());
-</code></pre><h3><a href="#cookies" name="cookies">Cookies</a></h3><p>Parses <code>Cookie</code> header and sets the <code>Set-Cookie</code> header to the response.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#cookies" name="cookies">Cookies</a></h3>
+<p>Parses <code>Cookie</code> header and sets the <code>Set-Cookie</code> header to the response.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new CookiesMiddleware());
-</code></pre><h3><a href="#defaultcharset" name="defaultcharset">DefaultCharset</a></h3><p>Adds the default charset to the response.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#defaultcharset" name="defaultcharset">DefaultCharset</a></h3>
+<p>Adds the default charset to the response.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new DefaultCharsetMiddleware());
-</code></pre><h3><a href="#flash" name="flash">Flash</a></h3><p>Serializes and deserializes a flash value.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#flash" name="flash">Flash</a></h3>
+<p>Serializes and deserializes a flash value.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new FlashMiddleware());
-</code></pre><h3><a href="#frameoptions" name="frameoptions">FrameOptions</a></h3><p>Adds the <code>X-Frame-Options</code> header to a response for a click jacking attack.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#frameoptions" name="frameoptions">FrameOptions</a></h3>
+<p>Adds the <code>X-Frame-Options</code> header to a response for a click jacking attack.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new FrameOptionsMiddleware());
-</code></pre><h3><a href="#idlesessiontimeout" name="idlesessiontimeout">IdleSessionTimeout</a></h3><p>Enkan Session has no expires in default. This middleware append the feature of timeout to the session.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#idlesessiontimeout" name="idlesessiontimeout">IdleSessionTimeout</a></h3>
+<p>Enkan Session has no expires in default. This middleware append the feature of timeout to the session.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new IdleSessionTimeoutMiddleware());
-</code></pre><h3><a href="#methodoverride" name="methodoverride">MethodOverride</a></h3><p>Override a request method.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#methodoverride" name="methodoverride">MethodOverride</a></h3>
+<p>Override a request method.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new MethodOverrideMiddleware());
-</code></pre><h3><a href="#multipartparams" name="multipartparams">MultipartParams</a></h3><p>Parses the multipart request.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#multipartparams" name="multipartparams">MultipartParams</a></h3>
+<p>Parses the multipart request.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new MultipartParamsMiddleware());
-</code></pre><h3><a href="#nestedparams" name="nestedparams">NestedParams</a></h3><p>NestedParamsMiddleware enables to parse nested parameters like <code>foo[][bar]</code>. It requires ParamMiddleware.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#nestedparams" name="nestedparams">NestedParams</a></h3>
+<p>NestedParamsMiddleware enables to parse nested parameters like <code>foo[][bar]</code>. It requires ParamMiddleware.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new NestedParamsMiddleware());
-</code></pre><h3><a href="#normalization" name="normalization">Normalization</a></h3><p>Normalize the parameter values. It&rsquo;s for trimming spaces or converting letter case.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#normalization" name="normalization">Normalization</a></h3>
+<p>Normalize the parameter values. It&rsquo;s for trimming spaces or converting letter case.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new NormalizationMiddleware());
-</code></pre><h3><a href="#params" name="params">Params</a></h3><p>ParamMiddleware enables to parse urlencoded query string and post body and set to a request object. </p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#params" name="params">Params</a></h3>
+<p>ParamMiddleware enables to parse urlencoded query string and post body and set to a request object. </p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new ParamsMiddleware());
-</code></pre><h3><a href="#resources" name="resources">Resources</a></h3><p>Returns the asset file that is searched from classpath.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#resources" name="resources">Resources</a></h3>
+<p>Returns the asset file that is searched from classpath.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new ResourceMiddleware());
-</code></pre><h4><a href="#properties" name="properties">Properties</a></h4>
+</code></pre>
+<h4><a href="#properties" name="properties">Properties</a></h4>
 <table>
   <thead>
     <tr>
@@ -203,9 +272,13 @@ Location: http://myhost/abc/123
       <td align="left">The path prefix. Default value is <code>public</code></td>
     </tr>
   </tbody>
-</table><h3><a href="#session" name="session">Session</a></h3><p>SessionMiddleware enables to store/load session objects to/from in-memory or JCache.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</table>
+<h3><a href="#session" name="session">Session</a></h3>
+<p>SessionMiddleware enables to store/load session objects to/from in-memory or JCache.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new SessionMiddleware());
-</code></pre><h4><a href="#properties" name="properties">Properties</a></h4>
+</code></pre>
+<h4><a href="#properties" name="properties">Properties</a></h4>
 <table>
   <thead>
     <tr>
@@ -223,19 +296,43 @@ Location: http://myhost/abc/123
       <td align="left">A storage for session.</td>
     </tr>
   </tbody>
-</table><h3><a href="#trace" name="trace">Trace</a></h3><p>Adds the response header for tracing using middlewares.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</table>
+<h3><a href="#trace" name="trace">Trace</a></h3>
+<p>Adds the response header for tracing using middlewares.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new TraceMiddleware());
-</code></pre><h3><a href="#xssprotection" name="xssprotection">XssProtection</a></h3><p>Adds <code>X-XSS-Protection</code> header to the response.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#xssprotection" name="xssprotection">XssProtection</a></h3>
+<p>Adds <code>X-XSS-Protection</code> header to the response.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new XssProtectionMiddleware());
-</code></pre><h2><a href="#kotowari" name="kotowari">Kotowari</a></h2><h3><a href="#controllerinvoker" name="controllerinvoker">ControllerInvoker</a></h3><p>Invoke a controller method.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h2><a href="#kotowari" name="kotowari">Kotowari</a></h2>
+<h3><a href="#controllerinvoker" name="controllerinvoker">ControllerInvoker</a></h3>
+<p>Invoke a controller method.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new ControllerInvokerMiddleware());
-</code></pre><h3><a href="#form" name="form">Form</a></h3><p>Populate the request body to a Java bean object.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h3><a href="#form" name="form">Form</a></h3>
+<p>Populate the request body to a Java bean object.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new FormMiddleware());
-</code></pre><h4><a href="#properties" name="properties">Properties</a></h4><p><code>FormMiddleware</code> has no properties.</p><h3><a href="#rendertemplate" name="rendertemplate">RenderTemplate</a></h3><p>Render HTML using a template. When a controller returns <code>TemplatedHttpResponse</code>, it has yet to be rendered. </p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h4><a href="#properties" name="properties">Properties</a></h4>
+<p><code>FormMiddleware</code> has no properties.</p>
+<h3><a href="#rendertemplate" name="rendertemplate">RenderTemplate</a></h3>
+<p>Render HTML using a template. When a controller returns <code>TemplatedHttpResponse</code>, it has yet to be rendered. </p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new RenderTemplateMiddleware());
-</code></pre><h4><a href="#properties" name="properties">Properties</a></h4><p><code>RenderTemplateMiddleware</code> has no properties.</p><h3><a href="#routing" name="routing">Routing</a></h3><p>Routes the request to a controller method.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</code></pre>
+<h4><a href="#properties" name="properties">Properties</a></h4>
+<p><code>RenderTemplateMiddleware</code> has no properties.</p>
+<h3><a href="#routing" name="routing">Routing</a></h3>
+<p>Routes the request to a controller method.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new RoutingMiddleware(routes));
-</code></pre><h4><a href="#properties" name="properties">Properties</a></h4>
+</code></pre>
+<h4><a href="#properties" name="properties">Properties</a></h4>
 <table>
   <thead>
     <tr>
@@ -249,9 +346,13 @@ Location: http://myhost/abc/123
       <td align="left">Defined routes</td>
     </tr>
   </tbody>
-</table><h3><a href="#serdes" name="serdes">SerDes</a></h3><p>Deserialize the request body and serializes the response body.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</table>
+<h3><a href="#serdes" name="serdes">SerDes</a></h3>
+<p>Deserialize the request body and serializes the response body.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new SerDesMiddleware());
-</code></pre><h4><a href="#properties" name="properties">Properties</a></h4>
+</code></pre>
+<h4><a href="#properties" name="properties">Properties</a></h4>
 <table>
   <thead>
     <tr>
@@ -267,13 +368,20 @@ Location: http://myhost/abc/123
       <td align="left" colspan="2">bodyWriters</td>
     </tr>
   </tbody>
-</table><h3><a href="#transaction" name="transaction">Transaction</a></h3><p>TBD</p><h3><a href="#validateform" name="validateform">ValidateForm</a></h3><p>Validates the body object. If body object is implemented the <code>Validatable</code> interface, the error messages is set to it.</p><h4><a href="#usage" name="usage">Usage</a></h4>
+</table>
+<h3><a href="#transaction" name="transaction">Transaction</a></h3>
+<p>TBD</p>
+<h3><a href="#validateform" name="validateform">ValidateForm</a></h3>
+<p>Validates the body object. If body object is implemented the <code>Validatable</code> interface, the error messages is set to it.</p>
+<h4><a href="#usage" name="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new ValidateFormMiddleware());
-</code></pre><h4><a href="#properties" name="properties">Properties</a></h4><p><code>ValidateFormMiddleware</code> has no properties. </p>
+</code></pre>
+<h4><a href="#properties" name="properties">Properties</a></h4>
+<p><code>ValidateFormMiddleware</code> has no properties. </p>
           </div>
         </div>
       </div>
-    <section>
+    </section>
   </div>
   </div>
     <footer>
@@ -287,11 +395,11 @@ Location: http://myhost/abc/123
         </div>
       </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
   </body>
 </html>

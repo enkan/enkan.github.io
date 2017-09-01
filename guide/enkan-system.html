@@ -6,15 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" type="text/css"/>
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.css" type="text/css"/>
 
-    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
     <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
       <div class="container">
+
         <div class="navbar-header page-scroll">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
             <span class="sr-only">Toggle navigation</span>
@@ -117,11 +118,17 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
-          <h1><a href="#enkan-system" name="enkan-system">Enkan System</a></h1><p>Enkan system is a container of components for managing the lifecycle and dependencies.<br/>It&rsquo;s inspired by <a href="https://github.com/stuartsierra/component">clojure component</a>.</p><h2><a href="#usage" name="usage">Usage</a></h2><p>Enkan system is composed of components.</p>
+          <h1><a href="#enkan-system" name="enkan-system">Enkan System</a></h1>
+<p>Enkan system is a container of components for managing the lifecycle and dependencies.<br/>It&rsquo;s inspired by <a href="https://github.com/stuartsierra/component">clojure component</a>.</p>
+<h2><a href="#usage" name="usage">Usage</a></h2>
+<p>Enkan system is composed of components.</p>
 <pre><code class="language-java">EnkanSystem system = EnkanSystem.of(
     &quot;http&quot;, new UndertowComponent()
 );
-</code></pre><p>Using <code>of</code> method, components are registered to Enkan system. </p><h3><a href="#creating-components" name="creating-components">Creating components</a></h3><p>Components must be extended <code>SystemComponent</code> class. And implements <code>ComponentLifecycle</code>.</p>
+</code></pre>
+<p>Using <code>of</code> method, components are registered to Enkan system. </p>
+<h3><a href="#creating-components" name="creating-components">Creating components</a></h3>
+<p>Components must be extended <code>SystemComponent</code> class. And implements <code>ComponentLifecycle</code>.</p>
 <pre><code class="language-java">class SomeComponent extends SystemComponent {
     @Override
     protected ComponentLifecycle&lt;SomeComponent&gt; lifecycle() {
@@ -136,10 +143,16 @@
         }
     }
 }
-</code></pre><p>ComponentLifecycle interface have 2 methods, <code>start</code> and <code>stop</code>. Their are called sequentially.<br/>So all components are started and stopped safely.</p><h3><a href="#relationships-between-components" name="relationships-between-components">Relationships between components</a></h3><h3><a href="#inject-components" name="inject-components">Inject components</a></h3><p>Components are injected to a field of another component and middlewares. </p><p>For injecting to a field, put the <code>Inject</code> annotation on it.</p>
+</code></pre>
+<p>ComponentLifecycle interface have 2 methods, <code>start</code> and <code>stop</code>. Their are called sequentially.<br/>So all components are started and stopped safely.</p>
+<h3><a href="#relationships-between-components" name="relationships-between-components">Relationships between components</a></h3>
+<h3><a href="#inject-components" name="inject-components">Inject components</a></h3>
+<p>Components are injected to a field of another component and middlewares. </p>
+<p>For injecting to a field, put the <code>Inject</code> annotation on it.</p>
 <pre><code class="language-java">@Inject
 private TemplateEngine templateEngine;
-</code></pre><p>If a class has multiple fields of same type, you can put the <code>Named</code> annotation for distinct. </p>
+</code></pre>
+<p>If a class has multiple fields of same type, you can put the <code>Named</code> annotation for distinct. </p>
 <pre><code class="language-java">@Named(&quot;freemarker&quot;)
 @Inject
 private TemplateEngine freemarker;
@@ -147,23 +160,27 @@ private TemplateEngine freemarker;
 @Named(&quot;thymeleaf&quot;)
 @Inject
 private TemplateEngine thymeleaf;
-</code></pre><h2><a href="#bootstrap-the-enkan-system" name="bootstrap-the-enkan-system">Bootstrap the Enkan system</a></h2><p>To start/stop the Enkan system, call the <code>start()</code> or <code>stop()</code> method.</p>
+</code></pre>
+<h2><a href="#bootstrap-the-enkan-system" name="bootstrap-the-enkan-system">Bootstrap the Enkan system</a></h2>
+<p>To start/stop the Enkan system, call the <code>start()</code> or <code>stop()</code> method.</p>
 <pre><code class="language-java">system.start();
 
 // ...
 
 system.stop();
-</code></pre><p>It is better to bootstrap a system in the REPL for the operation.</p>
+</code></pre>
+<p>It is better to bootstrap a system in the REPL for the operation.</p>
 <pre><code class="language-java">PseudoRepl repl = new PseudoRepl(MyExampleSystemFactory.class.getName());
 ReplBoot.start(repl,
         new KotowariCommandRegister(),
         new DevelCommandRegister(),
         new MetricsCommandRegister());
-</code></pre><p><code>PseudoRepl</code> is a REPL server. The factory class for Enkan system.<br/><code>ReplBoot</code> is a tool for starting the REPL server and registering some commands to the REPL at same time.</p>
+</code></pre>
+<p><code>PseudoRepl</code> is a REPL server. The factory class for Enkan system.<br/><code>ReplBoot</code> is a tool for starting the REPL server and registering some commands to the REPL at same time.</p>
           </div>
         </div>
       </div>
-    <section>
+    </section>
   </div>
   </div>
     <footer>
@@ -177,11 +194,11 @@ ReplBoot.start(repl,
         </div>
       </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
   </body>
 </html>

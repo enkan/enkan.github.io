@@ -6,15 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" type="text/css"/>
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.css" type="text/css"/>
 
-    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
     <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
       <div class="container">
+
         <div class="navbar-header page-scroll">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
             <span class="sr-only">Toggle navigation</span>
@@ -117,7 +118,9 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
-          <h1><a href="#controllers" name="controllers">Controllers</a></h1><h2><a href="#component-injection" name="component-injection">Component Injection</a></h2><p>Components that are registered in the Enkan system is injected to an annotated field with <code>Inject</code> of a controller.</p>
+          <h1><a href="#controllers" name="controllers">Controllers</a></h1>
+<h2><a href="#component-injection" name="component-injection">Component Injection</a></h2>
+<p>Components that are registered in the Enkan system is injected to an annotated field with <code>Inject</code> of a controller.</p>
 <pre><code class="language-java">public class UserController {
     @Inject
     private TemplateEngine templateEngine;
@@ -125,7 +128,9 @@
     @Inject
     private DomaProvider daoProvider;
 }
-</code></pre><h2><a href="#arguments" name="arguments">Arguments</a></h2><p>Arguments of a controller method are available as follows:</p>
+</code></pre>
+<h2><a href="#arguments" name="arguments">Arguments</a></h2>
+<p>Arguments of a controller method are available as follows:</p>
 <ul>
   <li>Parameters</li>
   <li>UserPrincipal</li>
@@ -134,13 +139,23 @@
   <li>Conversation</li>
   <li>ConversationState</li>
   <li>Request body object</li>
-</ul><p>If they are in the controller method parameters, <code>ControllerInvokerMiddleware</code> injects to the arguments.<br/>They are in random order.</p>
+</ul>
+<p>If they are in the controller method parameters, <code>ControllerInvokerMiddleware</code> injects to the arguments.<br/>They are in random order.</p>
 <pre><code class="language-java">public class ArgumentInjectionController {
     public String method1(Parameters params, UserPrincipal principal, Session session) {
 
     }
 }
-</code></pre><h3><a href="#parameters" name="parameters">Parameters</a></h3><p><code>Parameters</code> is a map represents a query string and a url encoded form.</p><h3><a href="#userprincipal" name="userprincipal">UserPrincipal</a></h3><p><code>UserPrincipal</code> represents an authenticated user. It is available when <code>AuthenticationMiddleware</code> is used.</p><h3><a href="#session" name="session">Session</a></h3><h3><a href="#flash" name="flash">Flash</a></h3><p>Flash is a short time session.</p><h2><a href="#validation" name="validation">Validation</a></h2><p>Kotowari supports validation of the request body object using JSR 303 Bean validation.</p>
+</code></pre>
+<h3><a href="#parameters" name="parameters">Parameters</a></h3>
+<p><code>Parameters</code> is a map represents a query string and a url encoded form.</p>
+<h3><a href="#userprincipal" name="userprincipal">UserPrincipal</a></h3>
+<p><code>UserPrincipal</code> represents an authenticated user. It is available when <code>AuthenticationMiddleware</code> is used.</p>
+<h3><a href="#session" name="session">Session</a></h3>
+<h3><a href="#flash" name="flash">Flash</a></h3>
+<p>Flash is a short time session.</p>
+<h2><a href="#validation" name="validation">Validation</a></h2>
+<p>Kotowari supports validation of the request body object using JSR 303 Bean validation.</p>
 <pre><code class="language-java">@Data
 @EqualsAndHashCode(callSuper = false)
 public class CustomerForm extends FormBase {
@@ -163,7 +178,7 @@ public class CustomerForm extends FormBase {
           </div>
         </div>
       </div>
-    <section>
+    </section>
   </div>
   </div>
     <footer>
@@ -177,11 +192,11 @@ public class CustomerForm extends FormBase {
         </div>
       </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
   </body>
 </html>

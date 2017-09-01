@@ -6,15 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" type="text/css"/>
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.css" type="text/css"/>
 
-    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
     <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
       <div class="container">
+
         <div class="navbar-header page-scroll">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
             <span class="sr-only">Toggle navigation</span>
@@ -117,19 +118,27 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
-          <h1><a href="#conversations" name="conversations">Conversations</a></h1><p>Enkan supports the pseudo Java EE Conversation scope.</p><h2><a href="#conversation" name="conversation">Conversation</a></h2><p><code>Conversation</code> gives an unique id to the series of long transactional requests.</p><p>If you start a conversation, describe as follows.</p>
+          <h1><a href="#conversations" name="conversations">Conversations</a></h1>
+<p>Enkan supports the pseudo Java EE Conversation scope.</p>
+<h2><a href="#conversation" name="conversation">Conversation</a></h2>
+<p><code>Conversation</code> gives an unique id to the series of long transactional requests.</p>
+<p>If you start a conversation, describe as follows.</p>
 <pre><code class="language-java">HttpResponse startConversation(Conversation conversation) {
     if (conversation.isTransient()) conversation.begin();
 }
-</code></pre><p>And if you end a conversation, describe as follows. </p>
+</code></pre>
+<p>And if you end a conversation, describe as follows. </p>
 <pre><code class="language-java">HttpResponse endConversation(Conversation conversation) {
     if (!conversation.isTransient()) conversation.end();
     
     // Transaction code...
 }
-</code></pre><p>A conversation send to the server via HTTP parameters. So, you need to write the following code in each form. </p>
+</code></pre>
+<p>A conversation send to the server via HTTP parameters. So, you need to write the following code in each form. </p>
 <pre><code class="language-html">&lt;input type=&quot;hidden&quot; name=&quot;__converstation-id&quot; value=&quot;${conversationId}&quot;/&gt;
-</code></pre><h2><a href="#conversation-state" name="conversation-state">Conversation state</a></h2><p>A <code>ConversationState</code> can have pairs of key and value related with conversation.<br/>If conversation ends, conversation state will be deleted. </p>
+</code></pre>
+<h2><a href="#conversation-state" name="conversation-state">Conversation state</a></h2>
+<p>A <code>ConversationState</code> can have pairs of key and value related with conversation.<br/>If conversation ends, conversation state will be deleted. </p>
 <pre><code class="language-java">HttpResponse conversation(Conversation conversation) {
     if (conversation.isTransient()) conversation.begin();
     
@@ -140,11 +149,12 @@
             .set(HttpResponse::setConversationState, conversationState)
             .build();
 }
-</code></pre><p>In above code, conversation state will be stored to the KVS store in the same case of Session.</p>
+</code></pre>
+<p>In above code, conversation state will be stored to the KVS store in the same case of Session.</p>
           </div>
         </div>
       </div>
-    <section>
+    </section>
   </div>
   </div>
     <footer>
@@ -158,11 +168,11 @@
         </div>
       </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
   </body>
 </html>

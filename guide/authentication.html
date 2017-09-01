@@ -6,15 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" type="text/css"/>
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.css" type="text/css"/>
 
-    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
     <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
       <div class="container">
+
         <div class="navbar-header page-scroll">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
             <span class="sr-only">Toggle navigation</span>
@@ -117,7 +118,13 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
-          <h1><a href="#authentication-and-authorization" name="authentication-and-authorization">Authentication and Authorization</a></h1><p>Enkan has the feature for authentication and authorization.</p><h2><a href="#authentication" name="authentication">Authentication</a></h2><p>Enkan&rsquo;s authentication is to fetch the user principal from some authentication backends.<br/>If fetching the user principal is successful, it is set to the request implements <code>PrincipalAvailable</code>.<br/>Even if fetching the user principal fails, <code>AuthenticationMiddleware</code> does not any exception.<br/>Because it is the role of authorization.</p><h2><a href="#authorization" name="authorization">Authorization</a></h2><p>Currently, neither Enkan nor Kotowari provides the middleware for authorization.</p><p>Using a predicate of the middleware, you can make the authorization function.</p>
+          <h1><a href="#authentication-and-authorization" name="authentication-and-authorization">Authentication and Authorization</a></h1>
+<p>Enkan has the feature for authentication and authorization.</p>
+<h2><a href="#authentication" name="authentication">Authentication</a></h2>
+<p>Enkan&rsquo;s authentication is to fetch the user principal from some authentication backends.<br/>If fetching the user principal is successful, it is set to the request implements <code>PrincipalAvailable</code>.<br/>Even if fetching the user principal fails, <code>AuthenticationMiddleware</code> does not any exception.<br/>Because it is the role of authorization.</p>
+<h2><a href="#authorization" name="authorization">Authorization</a></h2>
+<p>Currently, neither Enkan nor Kotowari provides the middleware for authorization.</p>
+<p>Using a predicate of the middleware, you can make the authorization function.</p>
 <pre><code class="language-java">app.use(and(path(&quot;^/guestbook/&quot;), authenticated().negate()),
         (Endpoint&lt;HttpRequest, HttpResponse&gt;) req -&gt;
                 redirect(&quot;/guestbook/login?url=&quot; + req.getUri(), TEMPORARY_REDIRECT));
@@ -125,7 +132,7 @@
           </div>
         </div>
       </div>
-    <section>
+    </section>
   </div>
   </div>
     <footer>
@@ -139,11 +146,11 @@
         </div>
       </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
   </body>
 </html>

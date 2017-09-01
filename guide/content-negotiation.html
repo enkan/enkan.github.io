@@ -6,15 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" type="text/css"/>
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.css" type="text/css"/>
 
-    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
     <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
       <div class="container">
+
         <div class="navbar-header page-scroll">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
             <span class="sr-only">Toggle navigation</span>
@@ -117,21 +118,27 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
-          <h1><a href="#content-negotiation" name="content-negotiation">Content negotiation</a></h1><p>Enkan possible to serve different response at the same URI depending on the Accept header.<br/>It enables to develop REST APIs.</p><p><code>SerDesMiddleware</code> deserializes the request body and serializes the response body.<br/>Available formats of the serialization are dependent on JAX-RS Entity providers.</p><p>If you add the dependency of <code>jackson-jaxrs-json-provider</code> into your Maven pom file, it will be enabled to serialize/deserialize JSON format.</p>
+          <h1><a href="#content-negotiation" name="content-negotiation">Content negotiation</a></h1>
+<p>Enkan possible to serve different response at the same URI depending on the Accept header.<br/>It enables to develop REST APIs.</p>
+<p><code>SerDesMiddleware</code> deserializes the request body and serializes the response body.<br/>Available formats of the serialization are dependent on JAX-RS Entity providers.</p>
+<p>If you add the dependency of <code>jackson-jaxrs-json-provider</code> into your Maven pom file, it will be enabled to serialize/deserialize JSON format.</p>
 <pre><code class="language-xml">&lt;dependency&gt;
     &lt;groupId&gt;com.fasterxml.jackson.jaxrs&lt;/groupId&gt;
     &lt;artifactId&gt;jackson-jaxrs-json-provider&lt;/artifactId&gt;
 &lt;/dependency&gt;
-</code></pre><h2><a href="#resource-controller" name="resource-controller">Resource controller</a></h2><p>If you want to return a response other than HTML format, simply return the Serializable object.</p>
+</code></pre>
+<h2><a href="#resource-controller" name="resource-controller">Resource controller</a></h2>
+<p>If you want to return a response other than HTML format, simply return the Serializable object.</p>
 <pre><code class="language-java">public List&lt;Customer&gt; list() {
     CustomerDao customerDao = daoProvider.getDao(CustomerDao.class);
     return customerDao.selectAll();
 }
-</code></pre><p>You don&rsquo;t need any annotations! <code>SerDesMiddleware</code> converts the Java object to the appropriate format.</p>
+</code></pre>
+<p>You don&rsquo;t need any annotations! <code>SerDesMiddleware</code> converts the Java object to the appropriate format.</p>
           </div>
         </div>
       </div>
-    <section>
+    </section>
   </div>
   </div>
     <footer>
@@ -145,11 +152,11 @@
         </div>
       </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
   </body>
 </html>
