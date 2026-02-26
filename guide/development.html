@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset=utf-8"/>
+    <title>Development Tools | Enkan</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
+
+    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body id="page-top">
+    <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
+      <div class="container">
+        <div class="navbar-header page-scroll">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">enkan</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="hidden active"><a href="#page-top"></a></li>
+            <li class="page-scroll">
+              <a href="getting-started.html">Docs</a>
+            </li>
+            <li>
+              <a href="https://github.com/kawasima/enkan">GitHub</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  <div class="container">
+  <div class="row">
+    <section class="col-lg-3">
+<nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
+  <h3>Quick Start</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../getting-started.html">
+        Getting Started
+      </a>
+    </li>
+  </ul>
+
+  <h3>Guide</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../guide/why-enkan.html">
+        Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/enkan-system.html">
+        Enkan system
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/application-factory.html">
+        Application factory
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/controller.html">
+        Controller
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/content-negotiation.html">
+        Content negotiation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/session.html">
+        Session
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/conversation.html">
+        Conversation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/authentication.html">
+        Authentication
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/file-uploading.html">
+        File uploading
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/development.html">
+        Development tools
+      </a>
+    </li>
+  </ul>
+
+  <h3>Reference</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../reference/middlewares.html">Middleware</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/components.html">Components</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/repl.html">REPL commands</a>
+    </li>
+  </ul>
+</nav>
+    </section>
+    <section class="col-lg-9">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+          <h1><a href="#development-tools" id="development-tools">Development Tools</a></h1>
+<p>Enkan provides a set of development tools that enable rapid iterative development.<br />
+The <code>enkan-devel</code> module includes class reloading, REPL compilation, automatic reset,<br />
+error visualization, and request tracing.</p>
+<h2><a href="#class-reloading" id="class-reloading">Class Reloading</a></h2>
+<p>Enkan supports hot-reloading of Java classes without restarting the JVM.<br />
+This is achieved by replacing the ClassLoader each time the application resets.</p>
+<h3><a href="#how-it-works" id="how-it-works">How It Works</a></h3>
+<ol>
+<li>
+<p><strong>ConfigurationLoader</strong> is a custom <code>ClassLoader</code> that identifies reloadable classpath directories.<br />
+A directory is considered reloadable if it contains <code>META-INF/reload.xml</code>.</p>
+</li>
+<li>
+<p>When the application starts, <code>ApplicationComponent</code> creates a new <code>ConfigurationLoader</code><br />
+and loads the <code>ApplicationFactory</code> class through it.</p>
+</li>
+<li>
+<p>When the application resets (<code>/reset</code>), the old <code>ConfigurationLoader</code> is discarded<br />
+and a new one is created. Since a fresh ClassLoader reads <code>.class</code> files from disk,<br />
+any recompiled classes are picked up automatically.</p>
+</li>
+</ol>
+<h3><a href="#setting-up-reloading" id="setting-up-reloading">Setting Up Reloading</a></h3>
+<p>Place an empty <code>META-INF/reload.xml</code> file in your resources directory:</p>
+<pre><code>src/main/resources/META-INF/reload.xml
+</code></pre>
+<p>This marks the corresponding output directory (e.g., <code>target/classes</code>) as a reloading target.<br />
+Only classes in directories containing this marker file will be reloaded.</p>
+<h3><a href="#what-gets-reloaded" id="what-gets-reloaded">What Gets Reloaded</a></h3>
+<ul>
+<li>Application factory classes</li>
+<li>Controller classes</li>
+<li>Any class loaded from a directory marked with <code>META-INF/reload.xml</code></li>
+</ul>
+<p>Classes from JAR dependencies are <strong>not</strong> reloaded. They are delegated to the parent ClassLoader.</p>
+<h2><a href="#auto-reset" id="auto-reset">Auto Reset</a></h2>
+<p>The <code>/autoreset</code> command watches compiled class files for changes and automatically<br />
+resets the application when a modification is detected.</p>
+<h3><a href="#usage" id="usage">Usage</a></h3>
+<pre><code>enkan&gt; /autoreset
+Start to watch modification an application.
+</code></pre>
+<p>Once enabled, whenever a <code>.class</code> file changes in a reloadable directory,<br />
+the system automatically calls <code>stop()</code> followed by <code>start()</code>, reloading all classes.</p>
+<h3><a href="#how-it-works" id="how-it-works">How It Works</a></h3>
+<p><code>ClassWatcher</code> uses Java NIO <code>WatchService</code> to monitor reloadable directories.<br />
+It registers watches recursively on all subdirectories and detects <code>ENTRY_CREATE</code><br />
+and <code>ENTRY_MODIFY</code> events. New subdirectories created after watching starts are<br />
+automatically registered.</p>
+<h3><a href="#typical-workflow" id="typical-workflow">Typical Workflow</a></h3>
+<ol>
+<li>Start the application: <code>/start</code></li>
+<li>Enable auto reset: <code>/autoreset</code></li>
+<li>Edit Java source files in your IDE</li>
+<li>Your IDE (or <code>/compile</code>) compiles the sources</li>
+<li>ClassWatcher detects the changed <code>.class</code> files</li>
+<li>The application resets automatically with the new code</li>
+</ol>
+<h2><a href="#compile-command" id="compile-command">Compile Command</a></h2>
+<p>The <code>/compile</code> command triggers project compilation from the REPL.</p>
+<h3><a href="#maven-default" id="maven-default">Maven (default)</a></h3>
+<pre><code>enkan&gt; /compile
+</code></pre>
+<p><code>MavenCompiler</code> invokes Maven&rsquo;s <code>compile</code> goal using the Maven Invoker API.<br />
+It reads <code>MAVEN_HOME</code> or <code>M2_HOME</code> environment variable (falls back to <code>/opt/maven</code>).</p>
+<h3><a href="#gradle" id="gradle">Gradle</a></h3>
+<p>To use Gradle instead of Maven, configure <code>DevelCommandRegister</code> with a <code>GradleCompiler</code>:</p>
+<pre><code class="language-java">DevelCommandRegister devel = new DevelCommandRegister(new GradleCompiler());
+</code></pre>
+<p><code>GradleCompiler</code> uses the Gradle Tooling API to invoke the <code>compileJava</code> task.<br />
+By default, it downloads Gradle 8.14.4 automatically. You can override this by setting<br />
+the <code>GRADLE_HOME</code> environment variable to use a local installation.</p>
+<h2><a href="#development-middlewares" id="development-middlewares">Development Middlewares</a></h2>
+<p>The <code>enkan-devel</code> module provides middlewares designed for use during development.<br />
+These should not be included in production deployments.</p>
+<h3><a href="#usage" id="usage">Usage</a></h3>
+<pre><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;net.unit8.enkan&lt;/groupId&gt;
+  &lt;artifactId&gt;enkan-devel&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+<h3><a href="#stacktracemiddleware" id="stacktracemiddleware">StacktraceMiddleware</a></h3>
+<p>Catches exceptions and renders detailed HTML error pages with stack traces.</p>
+<pre><code class="language-java">app.use(new StacktraceMiddleware&lt;&gt;());
+</code></pre>
+<p>It handles different exception types with specialized pages:</p>
+<ul>
+<li><strong>MisconfigurationException</strong> - Shows a configuration problem summary with actionable details</li>
+<li><strong>UnreachableException</strong> - Indicates a code path that should never be reached</li>
+<li><strong>Other exceptions</strong> - Renders a full stack trace with source context</li>
+</ul>
+<h3><a href="#tracewebmiddleware" id="tracewebmiddleware">TraceWebMiddleware</a></h3>
+<p>Records HTTP request/response traces and provides a web UI to inspect them.</p>
+<pre><code class="language-java">app.use(new TraceWebMiddleware&lt;&gt;());
+</code></pre>
+<p>Access the trace UI at <code>http://localhost:3000/x-enkan/requests</code> to see:</p>
+<ul>
+<li>A list of recent requests (up to 100 by default)</li>
+<li>Detailed view for each request showing headers, parameters, and response info</li>
+<li>Per-middleware execution timing (inbound and outbound)</li>
+</ul>
+<p>The mount path and store size are configurable:</p>
+<table>
+<thead>
+<tr><th align="left">Name</th><th align="left">Type</th><th align="left">Description</th><th align="left">Default</th></tr>
+</thead>
+<tbody>
+<tr><td align="left">mountPath</td><td align="left">String</td><td align="left">URL path for trace UI</td><td align="left">/x-enkan/requests</td></tr>
+<tr><td align="left">storeSize</td><td align="left">long</td><td align="left">Maximum number of stored requests</td><td align="left">100</td></tr>
+</tbody>
+</table>
+<h3><a href="#httpstatuscatmiddleware" id="httpstatuscatmiddleware">HttpStatusCatMiddleware</a></h3>
+<p>Renders HTTP status cat images for error responses. Useful for quickly identifying<br />
+status codes during development.</p>
+<pre><code class="language-java">app.use(new HttpStatusCatMiddleware());
+</code></pre>
+<h2><a href="#registering-development-commands" id="registering-development-commands">Registering Development Commands</a></h2>
+<p>Development commands are registered via <code>DevelCommandRegister</code> when bootstrapping the REPL:</p>
+<pre><code class="language-java">PseudoRepl repl = new PseudoRepl(MySystemFactory.class.getName());
+ReplBoot.start(repl,
+        new KotowariCommandRegister(),
+        new DevelCommandRegister(),
+        new MetricsCommandRegister());
+</code></pre>
+<p><code>DevelCommandRegister</code> registers the following commands:</p>
+<table>
+<thead>
+<tr><th align="left">Command</th><th align="left">Description</th></tr>
+</thead>
+<tbody>
+<tr><td align="left">/autoreset</td><td align="left">Watch class files and reset on change</td></tr>
+<tr><td align="left">/compile</td><td align="left">Compile project using Maven or Gradle</td></tr>
+</tbody>
+</table>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  </div>
+    <footer>
+      <div class="container">
+        <div class="col-lg-4">
+
+        </div>
+        <div class="col-lg-4 col-lg-offset-4">
+          © 2016 kawasima<br/>
+          Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+        </div>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+  </body>
+</html>

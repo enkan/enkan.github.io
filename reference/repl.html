@@ -2,20 +2,19 @@
 <html lang="en">
   <head>
     <meta charset=utf-8"/>
-    <title>REPL command | Enkan</title>
+    <title>REPL Commands | Enkan</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
     <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
       <div class="container">
-
         <div class="navbar-header page-scroll">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
             <span class="sr-only">Toggle navigation</span>
@@ -98,6 +97,11 @@
         File uploading
       </a>
     </li>
+    <li class="sidebar-brand">
+      <a href="../guide/development.html">
+        Development tools
+      </a>
+    </li>
   </ul>
 
   <h3>Reference</h3>
@@ -118,27 +122,56 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
-          <h1><a href="#repl-command" name="repl-command">REPL command</a></h1>
-<h2><a href="#core" name="core">Core</a></h2>
-<h3>/connect [port]</h3>
-<p>Connect to a remote Enkan system.</p>
-<h3><a href="#exit" name="exit">/exit</a></h3>
-<p>Disconnect from a remote Enkan system.</p>
-<h3><a href="#start" name="start">/start</a></h3>
-<p>Start the Enkan system.</p>
-<h3><a href="#stop" name="stop">/stop</a></h3>
-<p>Stop the Enkan system.</p>
-<h3><a href="#reset" name="reset">/reset</a></h3>
-<p>Stop and start the Enkan system.</p>
-<h3><a href="#shutdown" name="shutdown">/shutdown</a></h3>
-<p>Shutdown the Enkan system.</p>
-<h3>/middleware [app] list</h3>
-<p>Show the list of middlewares.</p>
-<h2><a href="#devel" name="devel">Devel</a></h2>
-<h3><a href="#autoreset" name="autoreset">/autoreset</a></h3>
-<p>Reset automatically when a class has changed.</p>
-<h3><a href="#compile" name="compile">/compile</a></h3>
-<p>Compile source codes using maven.</p>
+          <h1><a href="#repl-commands" id="repl-commands">REPL Commands</a></h1>
+<h2><a href="#core-commands" id="core-commands">Core Commands</a></h2>
+<p>These commands are always available in the Enkan REPL.</p>
+<h3><a href="#start" id="start">/start</a></h3>
+<p>Start the Enkan system. All components are started in dependency order.</p>
+<h3><a href="#stop" id="stop">/stop</a></h3>
+<p>Stop the Enkan system. All components are stopped in reverse dependency order.</p>
+<h3><a href="#reset" id="reset">/reset</a></h3>
+<p>Stop and restart the Enkan system. This triggers class reloading<br />
+when <code>META-INF/reload.xml</code> is present in the classpath.</p>
+<h3><a href="#shutdown" id="shutdown">/shutdown</a></h3>
+<p>Shut down the Enkan system and exit the REPL process.</p>
+<h3><a href="#help" id="help">/help</a></h3>
+<p>Show the list of available commands.</p>
+<h3><a href="#middleware-app-list" id="middleware-app-list">/middleware [app] list</a></h3>
+<p>Show the middleware stack for the specified application component.</p>
+<h2><a href="#devel-commands" id="devel-commands">Devel Commands</a></h2>
+<p>Registered by <code>DevelCommandRegister</code>. Requires the <code>enkan-devel</code> dependency.</p>
+<h3><a href="#autoreset" id="autoreset">/autoreset</a></h3>
+<p>Watch compiled class files for changes and automatically reset the application<br />
+when a modification is detected. Uses <code>WatchService</code> to monitor all<br />
+directories marked with <code>META-INF/reload.xml</code>.</p>
+<p>See <a href="../guide/development.html">Development Tools</a> for details on the class reloading mechanism.</p>
+<h3><a href="#compile" id="compile">/compile</a></h3>
+<p>Compile the project using the configured build tool.<br />
+By default, uses Maven (<code>MavenCompiler</code>). Can be configured to use Gradle<br />
+by passing a <code>GradleCompiler</code> to <code>DevelCommandRegister</code>.</p>
+<h2><a href="#kotowari-commands" id="kotowari-commands">Kotowari Commands</a></h2>
+<p>Registered by <code>KotowariCommandRegister</code>. Available when using the Kotowari web framework.</p>
+<h3><a href="#routes-app" id="routes-app">/routes [app]</a></h3>
+<p>Show the routing table for the specified application component.</p>
+<h2><a href="#scaffold-commands" id="scaffold-commands">Scaffold Commands</a></h2>
+<p>Registered by <code>ScaffoldCommandRegister</code>. Requires the <code>kotowari-scaffold</code> dependency.</p>
+<h3><a href="#generate-table-table-name-column-definitions" id="generate-table-table-name-column-definitions">/generate table TABLE_NAME (column definitions)</a></h3>
+<p>Generate a Flyway migration script for creating a database table.</p>
+<pre><code>enkan&gt; /generate table PRODUCT (id identity primary key, name varchar(255))
+</code></pre>
+<h3><a href="#generate-crud-table-name" id="generate-crud-table-name">/generate crud TABLE_NAME</a></h3>
+<p>Generate a CRUD controller, DAO, entity, and templates for the specified table.</p>
+<pre><code>enkan&gt; /generate crud PRODUCT
+</code></pre>
+<p>After generating, compile and reset to make the new routes available:</p>
+<pre><code>enkan&gt; /compile
+enkan&gt; /reset
+</code></pre>
+<h2><a href="#metrics-commands" id="metrics-commands">Metrics Commands</a></h2>
+<p>Registered by <code>MetricsCommandRegister</code>. Requires the <code>enkan-component-metrics</code> dependency.</p>
+<h3><a href="#metrics" id="metrics">/metrics</a></h3>
+<p>Display collected application metrics from the Metrics component.</p>
+
           </div>
         </div>
       </div>
@@ -156,11 +189,11 @@
         </div>
       </div>
     </footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-java.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
   </body>
 </html>
