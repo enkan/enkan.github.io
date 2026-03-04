@@ -31,7 +31,7 @@
               <a href="getting-started.html">Docs</a>
             </li>
             <li>
-              <a href="https://github.com/kawasima/enkan">GitHub</a>
+              <a href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -142,7 +142,29 @@ Available formats of the serialization are dependent on JAX-RS Entity providers.
 </code></pre>
 <p>You don&rsquo;t need any annotations! <code>SerDesMiddleware</code> converts the Java object to the appropriate format.</p>
 <h2><a href="#internationalization" id="internationalization">Internationalization</a></h2>
-<p>ContentNegotiationMiddleware decides an optimal language for each user.</p>
+<p><code>ContentNegotiationMiddleware</code> decides an optimal language for each request by reading the <code>Accept-Language</code> header and comparing it against the set of languages your application supports.</p>
+<p>Register the middleware with your allowed languages:</p>
+<pre><code class="language-language-java">ContentNegotiationMiddleware cnm = new ContentNegotiationMiddleware();
+cnm.setAllowedTypes(Set.of(&quot;text/html&quot;, &quot;application/json&quot;));
+cnm.setAllowedLanguages(Set.of(&quot;en&quot;, &quot;ja&quot;, &quot;fr&quot;));
+app.use(cnm);
+</code></pre>
+<p>The middleware adds the <code>ContentNegotiable</code> mixin to the request. Downstream middleware and controllers can read the resolved locale:</p>
+<pre><code class="language-language-java">public HttpResponse index(Locale locale) {
+    // locale is resolved from Accept-Language — e.g. Locale.JAPANESE
+    return templateEngine.render(&quot;index&quot;, &quot;locale&quot;, locale);
+}
+</code></pre>
+<h3><a href="#language-matching-rules" id="language-matching-rules">Language matching rules</a></h3>
+<p>Matching follows RFC 7231 quality weighting (<code>q</code> values). A request with:</p>
+<pre><code>Accept-Language: ja;q=1.0, en;q=0.8, *;q=0.1
+</code></pre>
+<p>&hellip;will resolve to <code>ja</code> if it is in <code>allowedLanguages</code>, otherwise fall back to <code>en</code>, and so on. The wildcard <code>*</code> in <code>allowedLanguages</code> (the default) means any language is accepted as-is.</p>
+<h3><a href="#allowed-content-types" id="allowed-content-types">Allowed content types</a></h3>
+<p><code>setAllowedTypes</code> controls which media types the application can produce. The middleware picks the best match from the request&rsquo;s <code>Accept</code> header:</p>
+<pre><code class="language-language-java">cnm.setAllowedTypes(Set.of(&quot;text/html&quot;, &quot;application/json&quot;, &quot;application/xml&quot;));
+</code></pre>
+<p>The resolved <code>MediaType</code> is available on the request via <code>ContentNegotiable#getMediaType()</code> and is used by <code>SerDesMiddleware</code> to choose the serialization format.</p>
 
           </div>
         </div>

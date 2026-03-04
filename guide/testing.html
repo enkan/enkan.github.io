@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset=utf-8"/>
+    <title>Testing | Enkan</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
+
+    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body id="page-top">
+    <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
+      <div class="container">
+        <div class="navbar-header page-scroll">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">enkan</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="hidden active"><a href="#page-top"></a></li>
+            <li class="page-scroll">
+              <a href="getting-started.html">Docs</a>
+            </li>
+            <li>
+              <a href="https://github.com/enkan/enkan">GitHub</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  <div class="container">
+  <div class="row">
+    <section class="col-lg-3">
+<nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
+  <h3>Quick Start</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../getting-started.html">
+        Getting Started
+      </a>
+    </li>
+  </ul>
+
+  <h3>Guide</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../guide/why-enkan.html">
+        Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/enkan-system.html">
+        Enkan system
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/application-factory.html">
+        Application factory
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/controller.html">
+        Controller
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/content-negotiation.html">
+        Content negotiation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/session.html">
+        Session
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/conversation.html">
+        Conversation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/authentication.html">
+        Authentication
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/file-uploading.html">
+        File uploading
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/development.html">
+        Development tools
+      </a>
+    </li>
+  </ul>
+
+  <h3>Reference</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../reference/middlewares.html">Middleware</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/components.html">Components</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/repl.html">REPL commands</a>
+    </li>
+  </ul>
+</nav>
+    </section>
+    <section class="col-lg-9">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+          <h1><a href="#testing" id="testing">Testing</a></h1>
+<p>Enkan&rsquo;s design makes testing straightforward: middleware and components are plain Java objects with no hidden wiring.<br />
+You do not need a running HTTP server or a full application context to test most code.</p>
+<hr />
+<h2><a href="#testing-middleware-in-isolation" id="testing-middleware-in-isolation">Testing Middleware in Isolation</a></h2>
+<p>The standard pattern is to construct a <code>DefaultMiddlewareChain</code> with a stub endpoint, then call <code>handle()</code> directly.</p>
+<pre><code class="language-language-java">import enkan.Endpoint;
+import enkan.MiddlewareChain;
+import enkan.chain.DefaultMiddlewareChain;
+import enkan.data.DefaultHttpRequest;
+import enkan.data.HttpRequest;
+import enkan.data.HttpResponse;
+import enkan.predicate.AnyPredicate;
+
+class MyMiddlewareTest {
+
+    private HttpResponse handleWith(MyMiddleware middleware, HttpResponse downstream) {
+        MiddlewareChain&lt;HttpRequest, HttpResponse, ?, ?&gt; chain =
+            new DefaultMiddlewareChain&lt;&gt;(
+                new AnyPredicate&lt;&gt;(), null,
+                (Endpoint&lt;HttpRequest, HttpResponse&gt;) req -&gt; downstream);
+        return middleware.handle(new DefaultHttpRequest(), chain);
+    }
+
+    @Test
+    void addsExpectedHeader() {
+        MyMiddleware middleware = new MyMiddleware();
+        HttpResponse response = HttpResponse.of(&quot;body&quot;);
+
+        HttpResponse result = handleWith(middleware, response);
+
+        assertThat(HttpResponseUtils.getHeader(result, &quot;X-My-Header&quot;)).isEqualTo(&quot;expected&quot;);
+    }
+}
+</code></pre>
+<p>Key points:</p>
+<ul>
+<li><code>DefaultHttpRequest</code> is a plain implementation of <code>HttpRequest</code> — set fields directly via setters or <code>BeanBuilder</code>.</li>
+<li>The <code>Endpoint</code> lambda acts as the downstream &ldquo;handler&rdquo; that returns the stubbed response.</li>
+<li><code>AnyPredicate</code> ensures the middleware is always invoked regardless of predicate logic.</li>
+</ul>
+<h3><a href="#building-request-objects" id="building-request-objects">Building request objects</a></h3>
+<p>Use <code>BeanBuilder</code> for concise request/response construction:</p>
+<pre><code class="language-language-java">import static enkan.util.BeanBuilder.builder;
+
+HttpRequest request = builder(new DefaultHttpRequest())
+    .set(HttpRequest::setRequestMethod, &quot;POST&quot;)
+    .set(HttpRequest::setUri, &quot;/api/items&quot;)
+    .set(HttpRequest::setHeaders, Headers.of(&quot;Content-Type&quot;, &quot;application/json&quot;))
+    .build();
+</code></pre>
+<h3><a href="#testing-middleware-that-uses-the-mixin-pattern" id="testing-middleware-that-uses-the-mixin-pattern">Testing middleware that uses the Mixin pattern</a></h3>
+<p>Some middleware adds capabilities to the request via <code>MixinUtils.mixin()</code>.<br />
+After calling <code>handle()</code>, cast the request inside the endpoint lambda to the mixin interface:</p>
+<pre><code class="language-language-java">@Test
+void setsLocaleOnRequest() {
+    ContentNegotiationMiddleware cnm = new ContentNegotiationMiddleware();
+    cnm.setAllowedLanguages(Set.of(&quot;en&quot;, &quot;ja&quot;));
+
+    HttpRequest captured = new DefaultHttpRequest();
+    captured.setHeaders(Headers.of(&quot;Accept-Language&quot;, &quot;ja&quot;));
+
+    MiddlewareChain&lt;HttpRequest, HttpResponse, ?, ?&gt; chain =
+        new DefaultMiddlewareChain&lt;&gt;(new AnyPredicate&lt;&gt;(), null,
+            (Endpoint&lt;HttpRequest, HttpResponse&gt;) req -&gt; {
+                // req has ContentNegotiable mixin at this point
+                assertThat(((ContentNegotiable) req).getLocale())
+                    .isEqualTo(Locale.JAPANESE);
+                return HttpResponse.of(&quot;&quot;);
+            });
+
+    cnm.handle(captured, chain);
+}
+</code></pre>
+<hr />
+<h2><a href="#testing-controllers" id="testing-controllers">Testing Controllers</a></h2>
+<p>Controllers are plain Java classes. Instantiate them directly, inject component mocks via setters,<br />
+and call the method under test.</p>
+<pre><code class="language-language-java">class CustomerControllerTest {
+
+    @Test
+    void indexReturnsTemplatedResponse() {
+        // Arrange
+        CustomerController controller = new CustomerController();
+        controller.setTemplateEngine(new FakeTemplateEngine());  // test double
+        controller.setDaoProvider(new FakeDaoProvider());
+
+        // Act
+        HttpResponse response = controller.index(new CustomerForm());
+
+        // Assert
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(200);
+    }
+}
+</code></pre>
+<p>Because components are injected via <code>@Inject</code>-annotated fields (not constructor arguments),<br />
+you can set them in tests using a simple setter or direct field access:</p>
+<pre><code class="language-language-java">// Direct field access for tests (when no setter exists)
+ReflectionTestUtils.setField(controller, &quot;templateEngine&quot;, fakeEngine);
+</code></pre>
+<hr />
+<h2><a href="#testing-components" id="testing-components">Testing Components</a></h2>
+<p>Components are lifecycle objects. Test them by calling <code>start()</code> and <code>stop()</code> explicitly,<br />
+or just test the component&rsquo;s methods without the full lifecycle if the method does not require it.</p>
+<pre><code class="language-language-java">class HikariCPComponentTest {
+
+    @Test
+    void providesWorkingDataSource() throws Exception {
+        HikariCPComponent component = new HikariCPComponent(
+            OptionMap.of(&quot;uri&quot;, &quot;jdbc:h2:mem:test;DB_CLOSE_DELAY=-1&quot;));
+        // Use EnkanSystem for lifecycle management in integration tests
+        EnkanSystem system = EnkanSystem.of(&quot;db&quot;, component);
+        system.start();
+        try {
+            try (Connection conn = component.getDataSource().getConnection()) {
+                assertThat(conn.isValid(1)).isTrue();
+            }
+        } finally {
+            system.stop();
+        }
+    }
+}
+</code></pre>
+<hr />
+<h2><a href="#integration-testing" id="integration-testing">Integration Testing</a></h2>
+<p>For integration tests that exercise the full middleware stack, build a minimal <code>Application</code><br />
+and drive it with constructed requests — no HTTP server needed.</p>
+<pre><code class="language-language-java">class AppIntegrationTest {
+
+    private Application&lt;HttpRequest, HttpResponse&gt; app;
+
+    @BeforeEach
+    void setUp() {
+        app = new MyApplicationFactory().create(buildSystem());
+    }
+
+    @Test
+    void getIndexReturns200() {
+        HttpRequest request = builder(new DefaultHttpRequest())
+            .set(HttpRequest::setRequestMethod, &quot;GET&quot;)
+            .set(HttpRequest::setUri, &quot;/&quot;)
+            .build();
+
+        HttpResponse response = app.handle(request);
+
+        assertThat(response.getStatus()).isEqualTo(200);
+    }
+}
+</code></pre>
+<hr />
+<h2><a href="#tips" id="tips">Tips</a></h2>
+<ul>
+<li><strong>Prefer <code>DefaultHttpRequest</code> over mocking</strong> — it is a real implementation and avoids bytecode manipulation issues with newer JDKs.</li>
+<li><strong>Use <code>Headers.of(...)</code> for headers</strong> — <code>Headers</code> is the correct type for both request and response headers.</li>
+<li><strong>Test one middleware at a time</strong> — each middleware is a small, focused unit; integration tests should be reserved for verifying the composed stack.</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  </div>
+    <footer>
+      <div class="container">
+        <div class="col-lg-4">
+
+        </div>
+        <div class="col-lg-4 col-lg-offset-4">
+          © 2016 kawasima<br/>
+          Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+        </div>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+  </body>
+</html>

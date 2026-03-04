@@ -31,7 +31,7 @@
               <a href="getting-started.html">Docs</a>
             </li>
             <li>
-              <a href="https://github.com/kawasima/enkan">GitHub</a>
+              <a href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -123,19 +123,147 @@
         <div class="row">
           <div class="col-lg-12">
           <h1><a href="#authentication-and-authorization" id="authentication-and-authorization">Authentication and Authorization</a></h1>
-<p>Enkan has the feature for authentication and authorization.</p>
-<h2><a href="#authentication" id="authentication">Authentication</a></h2>
-<p>Enkan&rsquo;s authentication is to fetch the user principal from some authentication backends.<br />
-If fetching the user principal is successful, it is set to the request implements <code>PrincipalAvailable</code>.<br />
-Even if fetching the user principal fails, <code>AuthenticationMiddleware</code> does not any exception.<br />
-Because it is the role of authorization.</p>
-<h2><a href="#authorization" id="authorization">Authorization</a></h2>
-<p>Currently, neither Enkan nor Kotowari provides the middleware for authorization.</p>
-<p>Using a predicate of the middleware, you can make the authorization function.</p>
-<pre><code class="language-language-java">app.use(and(path(&quot;^/guestbook/&quot;), authenticated().negate()),
-        (Endpoint&lt;HttpRequest, HttpResponse&gt;) req -&gt;
-                redirect(&quot;/guestbook/login?url=&quot; + req.getUri(), TEMPORARY_REDIRECT));
+<hr />
+<h2><a href="#how-authentication-works" id="how-authentication-works">How Authentication Works</a></h2>
+<p><code>AuthenticationMiddleware</code> runs a list of <code>AuthBackend</code> implementations in order.<br />
+Each backend gets a chance to parse the request and return a <code>Principal</code>.<br />
+The first non-null principal wins; remaining backends are skipped.</p>
+<p>The resolved principal is added to the request via the <code>PrincipalAvailable</code> mixin:</p>
+<pre><code class="language-language-java">app.use(new AuthenticationMiddleware&lt;&gt;(List.of(
+    new SessionBackend(),
+    new MyTokenBackend()
+)));
 </code></pre>
+<p>If <strong>no</strong> backend produces a principal, the middleware still passes the request downstream —<br />
+it does not throw or redirect. Enforcing access is the job of authorization (see below).</p>
+<hr />
+<h2><a href="#built-in-backends" id="built-in-backends">Built-in Backends</a></h2>
+<h3><a href="#sessionbackend" id="sessionbackend">SessionBackend</a></h3>
+<p>Reads a <code>Principal</code> stored under the key <code>&quot;principal&quot;</code> in the session.<br />
+Use this for classical login-form authentication where the principal is stored after a<br />
+successful credential check.</p>
+<pre><code class="language-language-java">// On login success — store the principal in the session
+HttpResponse response = builder(redirect(&quot;/dashboard&quot;))
+    .set(HttpResponse::setSession, Session.of(&quot;principal&quot;, new UserPrincipal(user)))
+    .build();
+</code></pre>
+<pre><code class="language-language-java">// Register the backend
+app.use(new AuthenticationMiddleware&lt;&gt;(List.of(new SessionBackend())));
+</code></pre>
+<p><code>SessionBackend</code> requires <code>SessionMiddleware</code> to run first (it reads from <code>request.getSession()</code>).</p>
+<h3><a href="#tokenbackend" id="tokenbackend">TokenBackend</a></h3>
+<p>Parses a bearer token from the <code>Authorization</code> header:</p>
+<pre><code>Authorization: Token &lt;your-token-here&gt;
+</code></pre>
+<p><code>TokenBackend.authenticate()</code> returns <code>null</code> by default — you must subclass it and implement<br />
+your own token verification:</p>
+<pre><code class="language-language-java">public class JwtTokenBackend extends TokenBackend {
+    private final JwtVerifier verifier;
+
+    public JwtTokenBackend(JwtVerifier verifier) {
+        this.verifier = verifier;
+    }
+
+    @Override
+    public Principal authenticate(HttpRequest request, String token) {
+        return verifier.verify(token)   // returns null if invalid
+                       .map(claims -&gt; new JwtPrincipal(claims))
+                       .orElse(null);
+    }
+}
+</code></pre>
+<p>To use a different header scheme (e.g. <code>Bearer</code>), call <code>setTokenName(&quot;Bearer&quot;)</code>.</p>
+<hr />
+<h2><a href="#implementing-a-custom-backend" id="implementing-a-custom-backend">Implementing a Custom Backend</a></h2>
+<p>Implement <code>AuthBackend&lt;REQ, T&gt;</code>:</p>
+<pre><code class="language-language-java">public class BasicAuthBackend implements AuthBackend&lt;HttpRequest, UsernamePassword&gt; {
+
+    private final UserRepository users;
+
+    @Override
+    public UsernamePassword parse(HttpRequest request) {
+        String header = Objects.toString(request.getHeaders().get(&quot;Authorization&quot;), &quot;&quot;);
+        if (!header.startsWith(&quot;Basic &quot;)) return null;
+        String decoded = new String(Base64.getDecoder().decode(header.substring(6)));
+        String[] parts = decoded.split(&quot;:&quot;, 2);
+        return parts.length == 2 ? new UsernamePassword(parts[0], parts[1]) : null;
+    }
+
+    @Override
+    public Principal authenticate(HttpRequest request, UsernamePassword credentials) {
+        return users.findByUsernameAndPassword(credentials.username(), credentials.password())
+                    .map(UserPrincipal::new)
+                    .orElse(null);
+    }
+}
+</code></pre>
+<p><code>parse()</code> extracts the raw credential data from the request; returning <code>null</code> means &ldquo;this<br />
+backend does not apply to this request&rdquo; and the next backend is tried.</p>
+<p><code>authenticate()</code> validates the credential and returns a <code>Principal</code>, or <code>null</code> on failure.</p>
+<hr />
+<h2><a href="#reading-the-principal-in-a-controller" id="reading-the-principal-in-a-controller">Reading the Principal in a Controller</a></h2>
+<p>When <code>AuthenticationMiddleware</code> has run, the request implements <code>PrincipalAvailable</code>.<br />
+Kotowari injects the principal as a method argument:</p>
+<pre><code class="language-language-java">public HttpResponse profile(UserPrincipal principal) {
+    if (principal == null) {
+        return redirect(&quot;/login&quot;);
+    }
+    return templateEngine.render(&quot;profile&quot;, &quot;user&quot;, principal);
+}
+</code></pre>
+<p>Or via the <code>@Inject</code>-based session approach for form-based login:</p>
+<pre><code class="language-language-java">public HttpResponse dashboard(UserPrincipal principal) {
+    return templateEngine.render(&quot;dashboard&quot;, &quot;principal&quot;, principal);
+}
+</code></pre>
+<hr />
+<h2><a href="#authorization" id="authorization">Authorization</a></h2>
+<p>Enkan does not provide a dedicated authorization middleware.<br />
+Instead, use <strong>predicates</strong> to restrict access before the protected middleware even runs.</p>
+<h3><a href="#redirect-unauthenticated-users" id="redirect-unauthenticated-users">Redirect unauthenticated users</a></h3>
+<pre><code class="language-language-java">app.use(
+    and(path(&quot;^/admin/&quot;), authenticated().negate()),
+    (Endpoint&lt;HttpRequest, HttpResponse&gt;) req -&gt;
+        redirect(&quot;/login?url=&quot; + req.getUri(), TEMPORARY_REDIRECT)
+);
+</code></pre>
+<h3><a href="#restrict-by-permission" id="restrict-by-permission">Restrict by permission</a></h3>
+<p>If your <code>Principal</code> implements a permission check, wrap it in a custom predicate:</p>
+<pre><code class="language-language-java">public class HasPermission implements Predicate&lt;HttpRequest&gt; {
+    private final String permission;
+
+    public HasPermission(String permission) {
+        this.permission = permission;
+    }
+
+    @Override
+    public boolean test(HttpRequest request) {
+        PrincipalAvailable pa = (PrincipalAvailable) request;
+        if (pa.getPrincipal() instanceof RoleBasedPrincipal rbp) {
+            return rbp.hasPermission(permission);
+        }
+        return false;
+    }
+}
+</code></pre>
+<pre><code class="language-language-java">app.use(
+    and(path(&quot;^/admin/&quot;), new HasPermission(&quot;ADMIN&quot;).negate()),
+    (Endpoint&lt;HttpRequest, HttpResponse&gt;) req -&gt;
+        HttpResponse.of(403, &quot;Forbidden&quot;)
+);
+</code></pre>
+<h3><a href="#summary" id="summary">Summary</a></h3>
+<table>
+<thead>
+<tr><th> Task </th><th> Tool </th></tr>
+</thead>
+<tbody>
+<tr><td> Identify who the user is </td><td> <code>AuthenticationMiddleware</code> + <code>AuthBackend</code> </td></tr>
+<tr><td> Store login state </td><td> <code>session.put(&quot;principal&quot;, principal)</code> </td></tr>
+<tr><td> Enforce access rules </td><td> Predicate + <code>Endpoint</code> redirect/403 </td></tr>
+<tr><td> Read principal in handler </td><td> <code>UserPrincipal</code> method argument (Kotowari) </td></tr>
+</tbody>
+</table>
 
           </div>
         </div>

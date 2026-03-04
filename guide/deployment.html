@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset=utf-8"/>
+    <title>Deployment | Enkan</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
+
+    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body id="page-top">
+    <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
+      <div class="container">
+        <div class="navbar-header page-scroll">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">enkan</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="hidden active"><a href="#page-top"></a></li>
+            <li class="page-scroll">
+              <a href="getting-started.html">Docs</a>
+            </li>
+            <li>
+              <a href="https://github.com/enkan/enkan">GitHub</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  <div class="container">
+  <div class="row">
+    <section class="col-lg-3">
+<nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
+  <h3>Quick Start</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../getting-started.html">
+        Getting Started
+      </a>
+    </li>
+  </ul>
+
+  <h3>Guide</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../guide/why-enkan.html">
+        Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/enkan-system.html">
+        Enkan system
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/application-factory.html">
+        Application factory
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/controller.html">
+        Controller
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/content-negotiation.html">
+        Content negotiation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/session.html">
+        Session
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/conversation.html">
+        Conversation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/authentication.html">
+        Authentication
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/file-uploading.html">
+        File uploading
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/development.html">
+        Development tools
+      </a>
+    </li>
+  </ul>
+
+  <h3>Reference</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../reference/middlewares.html">Middleware</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/components.html">Components</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/repl.html">REPL commands</a>
+    </li>
+  </ul>
+</nav>
+    </section>
+    <section class="col-lg-9">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+          <h1><a href="#deployment" id="deployment">Deployment</a></h1>
+<hr />
+<h2><a href="#packaging-as-an-executable-jar" id="packaging-as-an-executable-jar">Packaging as an Executable JAR</a></h2>
+<p>The recommended way to ship an Enkan application is as a self-contained fat JAR using the Maven Shade plugin.</p>
+<p>Add the following to your <code>pom.xml</code>:</p>
+<pre><code class="language-language-xml">&lt;plugin&gt;
+    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-shade-plugin&lt;/artifactId&gt;
+    &lt;executions&gt;
+        &lt;execution&gt;
+            &lt;phase&gt;package&lt;/phase&gt;
+            &lt;goals&gt;&lt;goal&gt;shade&lt;/goal&gt;&lt;/goals&gt;
+            &lt;configuration&gt;
+                &lt;transformers&gt;
+                    &lt;transformer implementation=
+                        &quot;org.apache.maven.plugins.shade.resource.ManifestResourceTransformer&quot;&gt;
+                        &lt;mainClass&gt;com.example.MyMain&lt;/mainClass&gt;
+                    &lt;/transformer&gt;
+                    &lt;transformer implementation=
+                        &quot;org.apache.maven.plugins.shade.resource.ServicesResourceTransformer&quot;/&gt;
+                &lt;/transformers&gt;
+            &lt;/configuration&gt;
+        &lt;/execution&gt;
+    &lt;/executions&gt;
+&lt;/plugin&gt;
+</code></pre>
+<p>Build and run:</p>
+<pre><code class="language-language-bash">mvn package
+java -jar target/myapp.jar
+</code></pre>
+<hr />
+<h2><a href="#entry-point" id="entry-point">Entry Point</a></h2>
+<p>The main class starts the REPL (or the system directly) and blocks:</p>
+<pre><code class="language-language-java">public class MyMain {
+    public static void main(String[] args) {
+        PseudoRepl repl = new PseudoRepl(MySystemFactory.class.getName());
+        ReplBoot.start(repl,
+            new KotowariCommandRegister(),
+            new DevelCommandRegister());
+    }
+}
+</code></pre>
+<p>For production, <code>PseudoRepl</code> listens on the console.<br />
+To skip the REPL and start the system directly:</p>
+<pre><code class="language-language-java">public class MyMain {
+    public static void main(String[] args) {
+        EnkanSystem system = new MySystemFactory().create();
+        Runtime.getRuntime().addShutdownHook(new Thread(system::stop));
+        system.start();
+    }
+}
+</code></pre>
+<hr />
+<h2><a href="#configuration-via-environment-variables" id="configuration-via-environment-variables">Configuration via Environment Variables</a></h2>
+<p>Enkan follows <a href="https://12factor.net/config">12-factor app</a> conventions.<br />
+Configuration is read from three sources in priority order:</p>
+<ol>
+<li>Java system properties (<code>-Dkey=value</code>)</li>
+<li>Environment variables (<code>KEY=value</code>)</li>
+<li><code>env.properties</code> on the classpath (development defaults)</li>
+</ol>
+<p>Use <code>Env</code> to read values in your system factory:</p>
+<pre><code class="language-language-java">import enkan.Env;
+
+builder(new JettyComponent())
+    .set(JettyComponent::setPort, Env.getInt(&quot;PORT&quot;, 3000))
+    .set(JettyComponent::setHost, Env.get(&quot;HOST&quot;, &quot;0.0.0.0&quot;))
+    .build()
+</code></pre>
+<p><code>Env</code> normalises key names: <code>DATABASE_URL</code> and <code>database.url</code> are treated as the same key.</p>
+<h3><a href="#envproperties-example" id="envproperties-example"><code>env.properties</code> example</a></h3>
+<pre><code class="language-language-properties">PORT=3000
+HOST=0.0.0.0
+DATABASE_URL=jdbc:h2:mem:dev
+</code></pre>
+<p>In production, set environment variables instead of bundling an <code>env.properties</code> file.</p>
+<hr />
+<h2><a href="#http-server-configuration" id="http-server-configuration">HTTP Server Configuration</a></h2>
+<p>Both <code>JettyComponent</code> and <code>UndertowComponent</code> inherit from <code>WebServerComponent</code> and share the same configuration API.</p>
+<table>
+<thead>
+<tr><th> Property </th><th> Setter </th><th> Default </th><th> Description </th></tr>
+</thead>
+<tbody>
+<tr><td> Port </td><td> <code>setPort(int)</code> </td><td> <code>80</code> </td><td> HTTP listen port </td></tr>
+<tr><td> Host </td><td> <code>setHost(String)</code> </td><td> <code>0.0.0.0</code> </td><td> Bind address </td></tr>
+<tr><td> SSL enabled </td><td> <code>setSsl(boolean)</code> </td><td> <code>false</code> </td><td> Enable HTTPS </td></tr>
+<tr><td> SSL port </td><td> <code>setSslPort(int)</code> </td><td> <code>443</code> </td><td> HTTPS listen port </td></tr>
+<tr><td> Keystore path </td><td> <code>setKeystorePath(String)</code> </td><td> — </td><td> Path to JKS keystore </td></tr>
+<tr><td> Keystore password </td><td> <code>setKeystorePassword(String)</code> </td><td> — </td><td> Keystore password </td></tr>
+</tbody>
+</table>
+<h3><a href="#https-example" id="https-example">HTTPS example</a></h3>
+<pre><code class="language-language-java">builder(new JettyComponent())
+    .set(JettyComponent::setPort,            Env.getInt(&quot;PORT&quot;, 8080))
+    .set(JettyComponent::setSsl,             true)
+    .set(JettyComponent::setSslPort,         Env.getInt(&quot;SSL_PORT&quot;, 8443))
+    .set(JettyComponent::setKeystorePath,    Env.get(&quot;KEYSTORE_PATH&quot;))
+    .set(JettyComponent::setKeystorePassword, Env.get(&quot;KEYSTORE_PASSWORD&quot;))
+    .build()
+</code></pre>
+<hr />
+<h2><a href="#database-migrations" id="database-migrations">Database Migrations</a></h2>
+<p><a href="../reference/components.md">FlywayMigration</a> runs migrations automatically when the component starts.<br />
+Add it to the system and declare it as a dependency of any component that needs a migrated schema:</p>
+<pre><code class="language-language-java">EnkanSystem.of(
+    &quot;datasource&quot;, new HikariCPComponent(OptionMap.of(&quot;uri&quot;, Env.get(&quot;DATABASE_URL&quot;))),
+    &quot;flyway&quot;,     new FlywayMigration(),
+    &quot;doma&quot;,       new DomaProvider(),
+    ...
+).relationships(
+    component(&quot;flyway&quot;).using(&quot;datasource&quot;),
+    component(&quot;doma&quot;).using(&quot;datasource&quot;, &quot;flyway&quot;),   // waits for migrations
+    ...
+);
+</code></pre>
+<p>Migration SQL files go in <code>src/main/resources/db/migration/</code> following Flyway&rsquo;s naming convention (<code>V1__description.sql</code>).</p>
+<hr />
+<h2><a href="#running-in-a-servlet-container" id="running-in-a-servlet-container">Running in a Servlet Container</a></h2>
+<p>Enkan supports deployment as a WAR via <code>enkan-servlet</code>.</p>
+<ol>
+<li>Change packaging to <code>war</code> in <code>pom.xml</code>.</li>
+<li>Extend <code>jakarta.servlet.http.HttpServlet</code> and delegate to <code>ServletUtils</code>:</li>
+</ol>
+<pre><code class="language-language-java">@WebServlet(urlPatterns = &quot;/*&quot;)
+public class MyServlet extends HttpServlet {
+    private EnkanSystem system;
+
+    @Override
+    public void init() {
+        system = new MySystemFactory().create();
+        system.start();
+    }
+
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse res)
+            throws IOException {
+        ApplicationComponent&lt;HttpRequest, HttpResponse&gt; app =
+            system.getComponent(&quot;app&quot;, ApplicationComponent.class);
+        HttpRequest request = ServletUtils.buildRequest(req);
+        HttpResponse response = app.getApplication().handle(request);
+        ServletUtils.updateServletResponse(res, response);
+    }
+
+    @Override
+    public void destroy() {
+        system.stop();
+    }
+}
+</code></pre>
+<hr />
+<h2><a href="#containerisation-docker" id="containerisation-docker">Containerisation (Docker)</a></h2>
+<p>A minimal <code>Dockerfile</code> for a fat JAR application:</p>
+<pre><code class="language-language-dockerfile">FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY target/myapp.jar app.jar
+EXPOSE 3000
+ENV PORT=3000
+ENTRYPOINT [&quot;java&quot;, &quot;-jar&quot;, &quot;app.jar&quot;]
+</code></pre>
+<p>Build and run:</p>
+<pre><code class="language-language-bash">docker build -t myapp .
+docker run -p 3000:3000 -e DATABASE_URL=jdbc:postgresql://db/mydb myapp
+</code></pre>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  </div>
+    <footer>
+      <div class="container">
+        <div class="col-lg-4">
+
+        </div>
+        <div class="col-lg-4 col-lg-offset-4">
+          © 2016 kawasima<br/>
+          Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+        </div>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+  </body>
+</html>

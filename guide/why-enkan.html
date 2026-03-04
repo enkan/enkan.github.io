@@ -31,7 +31,7 @@
               <a href="getting-started.html">Docs</a>
             </li>
             <li>
-              <a href="https://github.com/kawasima/enkan">GitHub</a>
+              <a href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -123,34 +123,150 @@
         <div class="row">
           <div class="col-lg-12">
           <h1><a href="#why-enkan" id="why-enkan">Why Enkan?</a></h1>
-<p>Enkan is a minimal framework inspired by <a href="https://github.com/ring-clojure/ring">ring-clojure</a>. We built Enkan and Kotowari to solve one problem:<br />
-<strong>building a web application by more explicit and simple way.</strong></p>
-<h2><a href="#explicitness" id="explicitness">Explicitness</a></h2>
+<p>Enkan is a minimal Java web framework inspired by <a href="https://github.com/ring-clojure/ring">Ring</a> (Clojure) and<br />
+<a href="https://github.com/senchalabs/connect">Connect</a> (Node.js).<br />
+It is built around one conviction: <strong>a web application should be explicit, traceable, and operable — not magical.</strong></p>
+<p>Most mainstream Java frameworks (Spring Boot, Quarkus, Jakarta EE) excel at hiding complexity.<br />
+Enkan takes the opposite approach: it makes every piece of request processing visible, composable, and inspectable.</p>
+<hr />
+<h2><a href="#core-philosophy" id="core-philosophy">Core Philosophy</a></h2>
+<h3><a href="#explicitness-over-convention" id="explicitness-over-convention">Explicitness over Convention</a></h3>
+<table>
+<thead>
+<tr><th> Concern </th><th> Typical framework </th><th> Enkan </th></tr>
+</thead>
+<tbody>
+<tr><td> Configuration </td><td> <code>application.yml</code>, classpath scanning </td><td> Plain Java code — no files </td></tr>
+<tr><td> Middleware ordering </td><td> Implicit (annotation-driven, auto-configured) </td><td> Explicit <code>app.use(...)</code> calls </td></tr>
+<tr><td> Capabilities on request </td><td> Always present (e.g. <code>getSession()</code> always available) </td><td> Added by middleware — absent until you <code>use(new SessionMiddleware())</code> </td></tr>
+<tr><td> Startup surprises </td><td> Framework injects beans you didn&rsquo;t expect </td><td> Only what you wired </td></tr>
+</tbody>
+</table>
+<p>Because there are no configuration files, your IDE can rename, refactor, and statically analyse the entire application setup.</p>
+<h3><a href="#anti-blackbox" id="anti-blackbox">Anti-Blackbox</a></h3>
+<p>When a request arrives, you can read the middleware stack from top to bottom in a single Java file and follow every transformation.<br />
+There is no AOP weaving, no annotation processor magic, and no &ldquo;auto-configuration&rdquo; that silently adds behaviour.</p>
+<p>The REPL lets you inspect the live stack at any time:</p>
+<pre><code>enkan&gt; /middleware app list
+ANY   defaultCharset   (enkan.middleware.DefaultCharsetMiddleware@4929dbc3)
+ANY   trace            (enkan.middleware.TraceMiddleware@1c985ffd)
+ANY   session          (enkan.middleware.SessionMiddleware@32424a32)
+ANY   routing          (kotowari.middleware.RoutingMiddleware@226c7147)
+</code></pre>
+<h3><a href="#fewer-annotations" id="fewer-annotations">Fewer Annotations</a></h3>
+<p>Annotations are useful, but overuse turns code into configuration disguised as code.<br />
+Enkan uses annotations only where compile-time metadata is genuinely needed (e.g. <code>@Middleware</code> to declare middleware dependencies).<br />
+Controllers, components, and middleware are plain Java classes.</p>
+<hr />
+<h2><a href="#type-safe-middleware-composition" id="type-safe-middleware-composition">Type-Safe Middleware Composition</a></h2>
+<p>This is the most technically distinctive aspect of Enkan.</p>
+<p>The <code>Middleware</code> interface carries four type parameters:</p>
+<pre><code class="language-java">interface Middleware&lt;REQ, RES, NREQ, NRES&gt; {
+    &lt;NNREQ, NNRES&gt; RES handle(REQ req, MiddlewareChain&lt;NREQ, NRES, NNREQ, NNRES&gt; chain);
+}
+</code></pre>
+<p><code>REQ</code>/<code>RES</code> are the types this middleware accepts; <code>NREQ</code>/<code>NRES</code> are the types it passes to the next middleware.<br />
+A middleware that adds session support can <em>change</em> the type of the request object, and the compiler verifies that downstream middleware actually expects the enriched type.</p>
+<p>In frameworks that use raw <code>HttpServletRequest</code>, the compiler cannot catch a middleware being placed in the wrong order.<br />
+Enkan catches such errors at compile time.</p>
+<hr />
+<h2><a href="#capability-based-request-enrichment-mixin-pattern" id="capability-based-request-enrichment-mixin-pattern">Capability-Based Request Enrichment (Mixin Pattern)</a></h2>
+<p>When <code>SessionMiddleware</code> runs, it dynamically adds the <code>WebSessionAvailable</code> interface to the request object via a JDK proxy:</p>
+<pre><code class="language-java">request = MixinUtils.mixin(request, WebSessionAvailable.class);
+</code></pre>
+<p>Until that middleware has run, <code>getSession()</code> does not exist on the request.<br />
+This makes <strong>which capabilities are available</strong> a function of which middleware you have registered — not a fixed API.<br />
+The result is that:</p>
 <ul>
-<li>Middleware pattern</li>
-<li>No configuration files</li>
-<li>Anti-blackbox</li>
-<li>Avoid annotation hell</li>
+<li>You cannot accidentally call <code>getSession()</code> before <code>SessionMiddleware</code> has run (it would be a compile error).</li>
+<li>Reading the middleware stack tells you exactly what each downstream handler can do.</li>
 </ul>
+<hr />
+<h2><a href="#component-system-with-explicit-lifecycle" id="component-system-with-explicit-lifecycle">Component System with Explicit Lifecycle</a></h2>
+<p>Enkan cleanly separates two concerns that many frameworks conflate:</p>
+<table>
+<thead>
+<tr><th> Concern </th><th> Enkan concept </th></tr>
+</thead>
+<tbody>
+<tr><td> Stateful services (DB pool, template engine, HTTP server) </td><td> <code>SystemComponent</code> managed by <code>EnkanSystem</code> </td></tr>
+<tr><td> Per-request processing logic </td><td> <code>Middleware</code> in the application stack </td></tr>
+</tbody>
+</table>
+<p>Dependencies between components are declared explicitly:</p>
+<pre><code class="language-java">EnkanSystem.of(
+    &quot;datasource&quot;, new HikariCPComponent(...),
+    &quot;doma&quot;,       new DomaProvider(),
+    &quot;template&quot;,   new FreemarkerComponent(),
+    &quot;app&quot;,        new ApplicationComponent(&quot;com.example.MyAppFactory&quot;),
+    &quot;http&quot;,       new JettyComponent()
+).relationships(
+    component(&quot;http&quot;).using(&quot;app&quot;),
+    component(&quot;app&quot;).using(&quot;template&quot;, &quot;doma&quot;, &quot;datasource&quot;),
+    component(&quot;doma&quot;).using(&quot;datasource&quot;)
+);
+</code></pre>
+<p>The system starts components in dependency order and stops them in reverse.<br />
+There is no classpath scanning to discover components — the graph is the documentation.</p>
+<hr />
 <h2><a href="#ease-of-development" id="ease-of-development">Ease of Development</a></h2>
-<ul>
-<li>Hot reloading</li>
-<li>Kindly exception for misconfiguration</li>
-<li>Trace the request / response</li>
-</ul>
+<h3><a href="#hot-reload-without-restart" id="hot-reload-without-restart">Hot Reload Without Restart</a></h3>
+<p>Changing a controller or middleware class triggers a sub-second application reset (not a JVM restart).<br />
+The component system restarts only the application layer, keeping long-initialisation resources (DB pools, etc.) alive.</p>
+<pre><code>enkan&gt; /reset          # ~1 second
+</code></pre>
+<h3><a href="#friendly-misconfiguration-errors" id="friendly-misconfiguration-errors">Friendly Misconfiguration Errors</a></h3>
+<p><code>@Middleware(dependencies = {&quot;cookies&quot;})</code> on <code>SessionMiddleware</code> means the system will<br />
+reject an application stack that places <code>SessionMiddleware</code> before <code>CookiesMiddleware</code> at startup,<br />
+with a clear message — not a <code>NullPointerException</code> at request time.</p>
+<h3><a href="#built-in-request-tracing" id="built-in-request-tracing">Built-In Request Tracing</a></h3>
+<p><code>TraceMiddleware</code> records timestamps at each layer. The accumulated trace is written to the<br />
+<code>X-Enkan-Trace</code> response header, giving you a per-request flamegraph without external tooling.</p>
+<hr />
 <h2><a href="#ease-of-operation" id="ease-of-operation">Ease of Operation</a></h2>
-<ul>
-<li>Start server quickly</li>
-<li>Metrics ready</li>
-<li>All in the REPL</li>
-</ul>
+<h3><a href="#fast-startup" id="fast-startup">Fast Startup</a></h3>
+<p>JVM startup is fast because there is no classpath scanning.<br />
+A typical Enkan application starts in under 3 seconds, including database migrations.</p>
+<h3><a href="#repl-driven-operations" id="repl-driven-operations">REPL-Driven Operations</a></h3>
+<pre><code>enkan&gt; /start                              # start the system
+enkan&gt; /stop                               # stop gracefully
+enkan&gt; /reset                              # hot-reload application
+enkan&gt; /routes app                         # inspect routing table
+enkan&gt; /middleware app predicate serviceUnavailable ANY   # toggle maintenance mode live
+enkan&gt; /connect 64815                      # attach to a running process via JShell
+</code></pre>
+<p>Runtime predicate changes mean you can enable maintenance mode, toggle feature flags,<br />
+or inspect internal state without redeployment.</p>
+<hr />
+<h2><a href="#comparison-with-other-frameworks" id="comparison-with-other-frameworks">Comparison with Other Frameworks</a></h2>
+<table>
+<thead>
+<tr><th> </th><th> Enkan </th><th> Spring Boot </th><th> Quarkus </th><th> Vert.x </th></tr>
+</thead>
+<tbody>
+<tr><td> Configuration </td><td> Java code only </td><td> YAML + annotations </td><td> properties + annotations </td><td> Java + JSON </td></tr>
+<tr><td> Classpath scanning </td><td> None </td><td> Extensive </td><td> Build-time </td><td> None </td></tr>
+<tr><td> Middleware type safety </td><td> Compile-time (generics) </td><td> Runtime (Filter chain) </td><td> Runtime </td><td> Runtime </td></tr>
+<tr><td> Component lifecycle </td><td> Explicit graph </td><td> <code>@Bean</code> + <code>@Autowired</code> </td><td> CDI / <code>@ApplicationScoped</code> </td><td> Verticle </td></tr>
+<tr><td> REPL / live inspection </td><td> Built-in </td><td> Actuator (HTTP) </td><td> Dev UI </td><td> – </td></tr>
+<tr><td> Reactive / async </td><td> Opt-in </td><td> WebFlux opt-in </td><td> Reactive opt-in </td><td> Core feature </td></tr>
+<tr><td> Target scale </td><td> Small–medium apps </td><td> All scales </td><td> Cloud-native </td><td> High-concurrency </td></tr>
+</tbody>
+</table>
+<p>Enkan is not trying to replace Spring Boot for large enterprise systems.<br />
+It is a deliberate choice for teams that value <strong>clarity and control</strong> over<br />
+<strong>convention and automation</strong>.</p>
+<hr />
 <h2><a href="#kotowari" id="kotowari">Kotowari</a></h2>
-<p>Kotowari is a minimal web framework on Enkan.</p>
+<p><a href="../kotowari.md">Kotowari</a> is a Rails-like web framework built on top of Enkan.<br />
+It adds:</p>
 <ul>
-<li>Routing like Ruby on Rails</li>
-<li>HTML template rendering</li>
-<li>Serialize/Deserialize a java object to/from various message formats.</li>
+<li>Declarative routing (<code>r.resource(CustomerController.class)</code>)</li>
+<li>Automatic request body deserialization into form / entity objects</li>
+<li>JSR-303 bean validation integration</li>
+<li>Template rendering (Freemarker, Thymeleaf)</li>
 </ul>
+<p>Kotowari inherits Enkan&rsquo;s philosophy: it is explicit, thin, and composed entirely of middleware.</p>
 
           </div>
         </div>

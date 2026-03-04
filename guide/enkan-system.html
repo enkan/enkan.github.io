@@ -31,7 +31,7 @@
               <a href="getting-started.html">Docs</a>
             </li>
             <li>
-              <a href="https://github.com/kawasima/enkan">GitHub</a>
+              <a href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -152,6 +152,23 @@ It&rsquo;s inspired by <a href="https://github.com/stuartsierra/component">cloju
 <p>ComponentLifecycle interface have 2 methods, <code>start</code> and <code>stop</code>. Their are called sequentially.<br />
 So all components are started and stopped safely.</p>
 <h3><a href="#relationships-between-components" id="relationships-between-components">Relationships between components</a></h3>
+<p>Components often depend on each other. For example, an application component needs a template engine and a database provider, and the database provider itself needs a datasource. You declare these relationships with <code>relationships()</code>:</p>
+<pre><code class="language-language-java">system.relationships(
+    component(&quot;http&quot;).using(&quot;app&quot;),
+    component(&quot;app&quot;).using(&quot;template&quot;, &quot;doma&quot;, &quot;datasource&quot;),
+    component(&quot;doma&quot;).using(&quot;datasource&quot;),
+    component(&quot;flyway&quot;).using(&quot;datasource&quot;)
+);
+</code></pre>
+<p><code>component(&quot;X&quot;).using(&quot;Y&quot;, &quot;Z&quot;)</code> means: <em>X depends on Y and Z</em>.</p>
+<p>Enkan uses these declarations to do two things automatically:</p>
+<ol>
+<li><strong>Startup ordering</strong> — dependencies are started before the components that use them. In the example above, <code>datasource</code> starts first, then <code>doma</code> and <code>flyway</code>, then <code>app</code>, then <code>http</code>.</li>
+<li><strong>Dependency injection</strong> — each component&rsquo;s fields annotated with <code>@Inject</code> are populated with the declared dependencies before <code>start()</code> is called.</li>
+</ol>
+<p>If a declared dependency is not registered in the system, Enkan throws a <code>MisconfigurationException</code> at startup — not at request time.</p>
+<pre><code>core.COMPONENT_NOT_FOUND: Component 'datasource' not found (required by 'doma')
+</code></pre>
 <h3><a href="#inject-components" id="inject-components">Inject components</a></h3>
 <p>Components are injected to a field of another component and middlewares.</p>
 <p>For injecting to a field, put the <code>Inject</code> annotation on it.</p>

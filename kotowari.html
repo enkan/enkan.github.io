@@ -31,7 +31,7 @@
               <a href="getting-started.html">Docs</a>
             </li>
             <li>
-              <a href="https://github.com/kawasima/enkan">GitHub</a>
+              <a href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -123,8 +123,170 @@
         <div class="row">
           <div class="col-lg-12">
           <h1><a href="#kotowari-理" id="kotowari-理">Kotowari 理</a></h1>
-<p>Kotowari is a lightweight MVC web appliction framework on Enkan.</p>
+<p>Kotowari is a lightweight MVC web application framework on Enkan.</p>
 <h2><a href="#controller" id="controller">Controller</a></h2>
+<p>A controller is a plain Java class. Its methods handle HTTP requests and return<br />
+an <code>HttpResponse</code> (or a value that a middleware converts into one).</p>
+<pre><code class="language-language-java">public class CustomerController {
+    @Inject
+    private TemplateEngine templateEngine;
+
+    @Inject
+    private DomaProvider daoProvider;
+
+    public HttpResponse index() {
+        CustomerDao dao = daoProvider.get(CustomerDao.class);
+        return templateEngine.render(&quot;customer/index&quot;,
+                &quot;customers&quot;, dao.selectAll());
+    }
+
+    public HttpResponse show(Parameters params) {
+        CustomerDao dao = daoProvider.get(CustomerDao.class);
+        return templateEngine.render(&quot;customer/show&quot;,
+                &quot;customer&quot;, dao.selectById(Long.valueOf(params.get(&quot;id&quot;))));
+    }
+}
+</code></pre>
+<h3><a href="#component-injection" id="component-injection">Component Injection</a></h3>
+<p>Components registered in the Enkan system are injected into <code>@Inject</code>-annotated<br />
+fields of a controller by <code>ControllerInvokerMiddleware</code>.</p>
+<pre><code class="language-language-java">@Inject
+private TemplateEngine templateEngine;
+
+@Inject
+private DomaProvider daoProvider;
+</code></pre>
+<p>If multiple fields share the same type, use <code>@Named</code> to distinguish them:</p>
+<pre><code class="language-language-java">@Named(&quot;freemarker&quot;)
+@Inject
+private TemplateEngine freemarker;
+
+@Named(&quot;thymeleaf&quot;)
+@Inject
+private TemplateEngine thymeleaf;
+</code></pre>
+<h3><a href="#method-arguments" id="method-arguments">Method Arguments</a></h3>
+<p><code>ControllerInvokerMiddleware</code> injects the following types into controller method<br />
+parameters automatically, in any order:</p>
+<table>
+<thead>
+<tr><th align="left"> Type              </th><th align="left"> Description                                              </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> <code>Parameters</code>      </td><td align="left"> Query string and form parameters                         </td></tr>
+<tr><td align="left"> <code>UserPrincipal</code>   </td><td align="left"> Authenticated user (requires <code>AuthenticationMiddleware</code>) </td></tr>
+<tr><td align="left"> <code>Session</code>         </td><td align="left"> HTTP session                                             </td></tr>
+<tr><td align="left"> <code>Flash</code>           </td><td align="left"> One-request flash messages                               </td></tr>
+<tr><td align="left"> <code>Conversation</code>    </td><td align="left"> Long-running conversation identifier                     </td></tr>
+<tr><td align="left"> <code>ConversationState</code> </td><td align="left"> Key/value state scoped to the current conversation     </td></tr>
+<tr><td align="left"> <code>Locale</code>          </td><td align="left"> Negotiated locale (requires <code>ContentNegotiationMiddleware</code>) </td></tr>
+</tbody>
+</table>
+<h2><a href="#routing" id="routing">Routing</a></h2>
+<p>Kotowari provides Rails-style routing.</p>
+<h3><a href="#defining-routes" id="defining-routes">Defining Routes</a></h3>
+<pre><code class="language-language-java">Routes routes = Routes.define(r -&gt; {
+    r.get(&quot;/&quot;).to(HomeController.class, &quot;index&quot;);
+    r.get(&quot;/customers&quot;).to(CustomerController.class, &quot;index&quot;);
+    r.get(&quot;/customers/:id&quot;).to(CustomerController.class, &quot;show&quot;);
+    r.post(&quot;/customers&quot;).to(CustomerController.class, &quot;create&quot;);
+    r.resource(CustomerController.class);   // generates all CRUD routes
+    r.scope(&quot;/admin&quot;, admin -&gt; {
+        admin.resource(UserController.class);
+    });
+}).compile();
+</code></pre>
+<h4><a href="#route-methods" id="route-methods">Route Methods</a></h4>
+<table>
+<thead>
+<tr><th align="left"> Method     </th><th align="left"> Description                                               </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> <code>get</code>      </td><td align="left"> Maps GET requests to a controller method                  </td></tr>
+<tr><td align="left"> <code>post</code>     </td><td align="left"> Maps POST requests to a controller method                 </td></tr>
+<tr><td align="left"> <code>put</code>      </td><td align="left"> Maps PUT requests to a controller method                  </td></tr>
+<tr><td align="left"> <code>patch</code>    </td><td align="left"> Maps PATCH requests to a controller method                </td></tr>
+<tr><td align="left"> <code>delete</code>   </td><td align="left"> Maps DELETE requests to a controller method               </td></tr>
+<tr><td align="left"> <code>resource</code> </td><td align="left"> Generates a full set of CRUD routes for a controller      </td></tr>
+<tr><td align="left"> <code>scope</code>    </td><td align="left"> Groups routes under a common path prefix                  </td></tr>
+</tbody>
+</table>
+<h4><a href="#resource-routes" id="resource-routes">Resource Routes</a></h4>
+<p><code>r.resource(CustomerController.class)</code> generates:</p>
+<table>
+<thead>
+<tr><th align="left"> HTTP verb </th><th align="left"> Path               </th><th align="left"> Controller method </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> GET       </td><td align="left"> /customers         </td><td align="left"> index             </td></tr>
+<tr><td align="left"> GET       </td><td align="left"> /customers/:id     </td><td align="left"> show              </td></tr>
+<tr><td align="left"> GET       </td><td align="left"> /customers/new     </td><td align="left"> newForm           </td></tr>
+<tr><td align="left"> POST      </td><td align="left"> /customers         </td><td align="left"> create            </td></tr>
+<tr><td align="left"> GET       </td><td align="left"> /customers/:id/edit</td><td align="left"> edit              </td></tr>
+<tr><td align="left"> PUT       </td><td align="left"> /customers/:id     </td><td align="left"> update            </td></tr>
+<tr><td align="left"> DELETE    </td><td align="left"> /customers/:id     </td><td align="left"> delete            </td></tr>
+</tbody>
+</table>
+<h3><a href="#path-generation" id="path-generation">Path Generation</a></h3>
+<pre><code class="language-language-java">// Generates &quot;/customers/&quot;
+routes.generate(OptionMap.of(&quot;controller&quot;, CustomerController.class, &quot;action&quot;, &quot;index&quot;));
+
+// Generates &quot;/customers/1&quot;
+routes.generate(OptionMap.of(&quot;controller&quot;, CustomerController.class, &quot;action&quot;, &quot;show&quot;, &quot;id&quot;, 1));
+</code></pre>
+<h2><a href="#form-handling" id="form-handling">Form Handling</a></h2>
+<p><code>FormMiddleware</code> populates a form object from request parameters.</p>
+<pre><code class="language-language-java">public class CustomerForm extends FormBase {
+    @NotBlank
+    @Size(max = 100)
+    private String name;
+
+    @Email
+    private String email;
+}
+</code></pre>
+<p>The form object is injected into the controller method by <code>ControllerInvokerMiddleware</code>:</p>
+<pre><code class="language-language-java">public HttpResponse create(CustomerForm form) {
+    // form fields are already populated from request parameters
+}
+</code></pre>
+<h2><a href="#validation" id="validation">Validation</a></h2>
+<p><code>ValidateBodyMiddleware</code> validates the form object using Jakarta Bean Validation (JSR 380).<br />
+Validation errors are stored on the form object itself (via <code>Validatable</code>).</p>
+<pre><code class="language-language-java">public HttpResponse create(CustomerForm form) {
+    if (!form.isValid()) {
+        return templateEngine.render(&quot;customer/new&quot;, &quot;form&quot;, form);
+    }
+    // proceed with valid form
+}
+</code></pre>
+<h2><a href="#transactions" id="transactions">Transactions</a></h2>
+<p><code>TransactionMiddleware</code> wraps controller invocation in a JTA transaction when<br />
+the controller method or class is annotated with <code>@Transactional</code>.</p>
+<pre><code class="language-language-java">@Transactional
+public HttpResponse create(CustomerForm form) {
+    CustomerDao dao = daoProvider.get(CustomerDao.class);
+    dao.insert(toEntity(form));
+    return redirect(&quot;/customers&quot;);
+}
+</code></pre>
+<p>If the controller method throws a <code>RuntimeException</code>, the transaction is rolled back automatically.</p>
+<h2><a href="#content-negotiation-serdes" id="content-negotiation-serdes">Content Negotiation (SerDes)</a></h2>
+<p><code>SerDesMiddleware</code> deserializes the request body and serializes the response body<br />
+using JAX-RS <code>MessageBodyReader</code>/<code>MessageBodyWriter</code> implementations.</p>
+<p>Add a JAX-RS provider dependency (e.g. Jackson) to enable JSON support:</p>
+<pre><code class="language-language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;com.fasterxml.jackson.jaxrs&lt;/groupId&gt;
+    &lt;artifactId&gt;jackson-jaxrs-json-provider&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+<p>A controller method can return any serializable object:</p>
+<pre><code class="language-language-java">public List&lt;Customer&gt; list() {
+    return daoProvider.get(CustomerDao.class).selectAll();
+}
+</code></pre>
+<p><code>SerDesMiddleware</code> automatically converts it to JSON (or another format)<br />
+based on the <code>Accept</code> request header.</p>
 
           </div>
         </div>

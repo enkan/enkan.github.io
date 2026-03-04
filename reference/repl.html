@@ -31,7 +31,7 @@
               <a href="getting-started.html">Docs</a>
             </li>
             <li>
-              <a href="https://github.com/kawasima/enkan">GitHub</a>
+              <a href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -153,20 +153,6 @@ by passing a <code>GradleCompiler</code> to <code>DevelCommandRegister</code>.</
 <p>Registered by <code>KotowariCommandRegister</code>. Available when using the Kotowari web framework.</p>
 <h3><a href="#routes-app" id="routes-app">/routes [app]</a></h3>
 <p>Show the routing table for the specified application component.</p>
-<h2><a href="#scaffold-commands" id="scaffold-commands">Scaffold Commands</a></h2>
-<p>Registered by <code>ScaffoldCommandRegister</code>. Requires the <code>kotowari-scaffold</code> dependency.</p>
-<h3><a href="#generate-table-table-name-column-definitions" id="generate-table-table-name-column-definitions">/generate table TABLE_NAME (column definitions)</a></h3>
-<p>Generate a Flyway migration script for creating a database table.</p>
-<pre><code>enkan&gt; /generate table PRODUCT (id identity primary key, name varchar(255))
-</code></pre>
-<h3><a href="#generate-crud-table-name" id="generate-crud-table-name">/generate crud TABLE_NAME</a></h3>
-<p>Generate a CRUD controller, DAO, entity, and templates for the specified table.</p>
-<pre><code>enkan&gt; /generate crud PRODUCT
-</code></pre>
-<p>After generating, compile and reset to make the new routes available:</p>
-<pre><code>enkan&gt; /compile
-enkan&gt; /reset
-</code></pre>
 <h2><a href="#metrics-commands" id="metrics-commands">Metrics Commands</a></h2>
 <p>Registered by <code>MetricsCommandRegister</code>. Requires the <code>enkan-component-metrics</code> dependency.</p>
 <h3><a href="#metrics" id="metrics">/metrics</a></h3>

@@ -31,7 +31,7 @@
               <a href="getting-started.html">Docs</a>
             </li>
             <li>
-              <a href="https://github.com/kawasima/enkan">GitHub</a>
+              <a href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -137,7 +137,7 @@
 </tbody>
 </table>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new AuthenticateMiddleware(backends));
+<pre><code class="language-language-java">app.use(new AuthenticationMiddleware(backends));
 </code></pre>
 <h3><a href="#serviceunavailable" id="serviceunavailable">ServiceUnavailable</a></h3>
 <h4><a href="#usage" id="usage">Usage</a></h4>
@@ -185,11 +185,6 @@ If the token is invalid, it returns the forbidden response.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
 <pre><code class="language-language-java">app.use(new ContentTypeMiddleware());
 </code></pre>
-<h3><a href="#contenttypeoptions" id="contenttypeoptions">ContentTypeOptions</a></h3>
-<p>Adds the <code>X-Content-Type-Options</code> for protecting a XSS attack.</p>
-<h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new ContentTypeOptionsMiddleware());
-</code></pre>
 <h3><a href="#conversation" id="conversation">Conversation</a></h3>
 <p>Creates a conversation and save states related with its conversation to the conversation store.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
@@ -209,11 +204,6 @@ If the token is invalid, it returns the forbidden response.</p>
 <p>Serializes and deserializes a flash value.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
 <pre><code class="language-language-java">app.use(new FlashMiddleware());
-</code></pre>
-<h3><a href="#frameoptions" id="frameoptions">FrameOptions</a></h3>
-<p>Adds the <code>X-Frame-Options</code> header to a response for a click jacking attack.</p>
-<h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new FrameOptionsMiddleware());
 </code></pre>
 <h3><a href="#idlesessiontimeout" id="idlesessiontimeout">IdleSessionTimeout</a></h3>
 <p>Enkan Session has no expires in default. This middleware append the feature of timeout to the session.</p>
@@ -279,11 +269,51 @@ If the token is invalid, it returns the forbidden response.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
 <pre><code class="language-language-java">app.use(new TraceMiddleware());
 </code></pre>
-<h3><a href="#xssprotection" id="xssprotection">XssProtection</a></h3>
-<p>Adds <code>X-XSS-Protection</code> header to the response.</p>
+<h3><a href="#securityheaders" id="securityheaders">SecurityHeaders</a></h3>
+<p>Applies a suite of security-related HTTP response headers in a single middleware (similar to <a href="https://helmetjs.github.io/">Helmet.js</a> for Express).</p>
+<p>All headers are enabled by default with safe values. Pass <code>null</code> to any setter to disable a specific header.</p>
+<h4><a href="#default-headers" id="default-headers">Default headers</a></h4>
+<table>
+<thead>
+<tr><th align="left"> Header </th><th align="left"> Default value </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> <code>Content-Security-Policy</code> </td><td align="left"> <code>default-src 'self'</code> </td></tr>
+<tr><td align="left"> <code>Strict-Transport-Security</code> </td><td align="left"> <code>max-age=15552000; includeSubDomains</code> </td></tr>
+<tr><td align="left"> <code>X-Content-Type-Options</code> </td><td align="left"> <code>nosniff</code> </td></tr>
+<tr><td align="left"> <code>X-Frame-Options</code> </td><td align="left"> <code>SAMEORIGIN</code> </td></tr>
+<tr><td align="left"> <code>X-XSS-Protection</code> </td><td align="left"> <code>0</code> (disabled — use CSP instead) </td></tr>
+<tr><td align="left"> <code>Referrer-Policy</code> </td><td align="left"> <code>strict-origin-when-cross-origin</code> </td></tr>
+<tr><td align="left"> <code>Cross-Origin-Opener-Policy</code> </td><td align="left"> <code>same-origin</code> </td></tr>
+<tr><td align="left"> <code>Cross-Origin-Resource-Policy</code> </td><td align="left"> <code>same-origin</code> </td></tr>
+</tbody>
+</table>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new XssProtectionMiddleware());
+<pre><code class="language-language-java">// All defaults
+app.use(new SecurityHeadersMiddleware());
+
+// Custom CSP, disable HSTS for local development
+SecurityHeadersMiddleware sec = new SecurityHeadersMiddleware();
+sec.setContentSecurityPolicy(&quot;default-src 'self'; img-src *&quot;);
+sec.setStrictTransportSecurity(null); // disable
+app.use(sec);
 </code></pre>
+<h4><a href="#properties" id="properties">Properties</a></h4>
+<table>
+<thead>
+<tr><th align="left"> Name </th><th align="left"> Description </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> <code>contentSecurityPolicy</code> </td><td align="left"> <code>Content-Security-Policy</code> value. <code>null</code> disables the header. </td></tr>
+<tr><td align="left"> <code>strictTransportSecurity</code> </td><td align="left"> <code>Strict-Transport-Security</code> value. <code>null</code> disables the header. </td></tr>
+<tr><td align="left"> <code>contentTypeOptions</code> </td><td align="left"> <code>X-Content-Type-Options</code> value. Default: <code>nosniff</code>. </td></tr>
+<tr><td align="left"> <code>frameOptions</code> </td><td align="left"> <code>X-Frame-Options</code> value. Default: <code>SAMEORIGIN</code>. </td></tr>
+<tr><td align="left"> <code>xssProtection</code> </td><td align="left"> <code>X-XSS-Protection</code> value. Default: <code>0</code>. </td></tr>
+<tr><td align="left"> <code>referrerPolicy</code> </td><td align="left"> <code>Referrer-Policy</code> value. </td></tr>
+<tr><td align="left"> <code>crossOriginOpenerPolicy</code> </td><td align="left"> <code>Cross-Origin-Opener-Policy</code> value. </td></tr>
+<tr><td align="left"> <code>crossOriginResourcePolicy</code> </td><td align="left"> <code>Cross-Origin-Resource-Policy</code> value. </td></tr>
+</tbody>
+</table>
 <h2><a href="#kotowari" id="kotowari">Kotowari</a></h2>
 <h3><a href="#controllerinvoker" id="controllerinvoker">ControllerInvoker</a></h3>
 <p>Invoke a controller method.</p>
@@ -336,7 +366,8 @@ If the token is invalid, it returns the forbidden response.</p>
 <h3><a href="#transaction" id="transaction">Transaction</a></h3>
 <p>Manages database transactions around controller invocation.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new DomaTransactionMiddleware());
+<pre><code class="language-language-java">// requires enkan-component-doma2 dependency
+app.use(new DomaTransactionMiddleware&lt;&gt;(config));
 </code></pre>
 <h3><a href="#validatebody" id="validatebody">ValidateBody</a></h3>
 <p>Validates the body object. If body object implements the <code>Validatable</code> interface, the error messages are set to it.</p>

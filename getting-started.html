@@ -31,7 +31,7 @@
               <a href="getting-started.html">Docs</a>
             </li>
             <li>
-              <a href="https://github.com/kawasima/enkan">GitHub</a>
+              <a href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -130,7 +130,7 @@
 </ul>
 <h2><a href="#maven-archetype" id="maven-archetype">Maven archetype</a></h2>
 <p>You can create an Enkan&rsquo;s blank project from maven archetype.</p>
-<pre><code class="language-language">% mvn archetype:generate -DarchetypeGroupId=net.unit8.enkan -DarchetypeArtifactId=kotowari-archetype -DarchetypeVersion=0.11.0
+<pre><code class="language-language-bash">% mvn archetype:generate -DarchetypeGroupId=net.unit8.enkan -DarchetypeArtifactId=kotowari-archetype -DarchetypeVersion=0.12.0
 </code></pre>
 <p>By default, following components is enabled.</p>
 <ul>
@@ -145,30 +145,9 @@
 <pre><code class="language-language-bash">% mvn -e compile exec:java
 </code></pre>
 <p>If you execute the <code>/start</code> command, application will start.</p>
-<pre><code class="language-language-bash">enkan&gt; /start /
+<pre><code class="language-language-bash">enkan&gt; /start
 </code></pre>
-<h2><a href="#scaffolding" id="scaffolding">Scaffolding</a></h2>
-<p><code>enkan-devel</code> is a useful tool in development. it contains the command to generate an application scaffold.</p>
-<h3><a href="#create-table" id="create-table">Create table</a></h3>
-<pre><code class="language-language-bash">enkan&gt; /generate table PRODUCT (id identity primary key, name varchar(255))
-</code></pre>
-<p>If automatic building is unavailable, the <code>/compile</code> command is useful.</p>
-<pre><code class="language-language-bash">enkan&gt; /compile
-</code></pre>
-<p>When you reset your application, Flyway component will execute the generated migration.</p>
-<pre><code class="language-language-bash">enkan&gt; /reset
-</code></pre>
-<h3><a href="#generate-a-crud-controller-and-templates" id="generate-a-crud-controller-and-templates">Generate a CRUD controller and templates</a></h3>
-<p>When you execute <code>/generate</code> command, a CRUD controller and templates will be generated.</p>
-<pre><code class="language-language-bash">enkan&gt; /generate crud PRODUCT
-</code></pre>
-<p>If necessary, compile it.</p>
-<pre><code class="language-language-bash">enkan&gt; /compile
-</code></pre>
-<p>When you reset your application, the generated routes are reloaded and become available.</p>
-<pre><code class="language-language-bash">enkan&gt; /reset
-</code></pre>
-<p>Try to access <a href="http://localhost:3000/product"><code>http://localhost:3000/product</code></a> in your browser.</p>
+<p>Try to access <a href="http://localhost:3000/"><code>http://localhost:3000/</code></a> in your browser.</p>
 
           </div>
         </div>
