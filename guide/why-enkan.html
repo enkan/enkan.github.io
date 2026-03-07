@@ -6,32 +6,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
-
-    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
-    <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
-        <div class="navbar-header page-scroll">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="../index.html">enkan</a>
-        </div>
+        <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+          <img src="../img/logo.png" alt="enkan logo" class="navbar-logo">enkan
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bs-navbar-collapse-1" aria-controls="bs-navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-            <li class="hidden active"><a href="#page-top"></a></li>
-            <li class="page-scroll">
-              <a href="getting-started.html">Docs</a>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../getting-started.html">Docs</a>
             </li>
-            <li>
-              <a href="https://github.com/enkan/enkan">GitHub</a>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -39,7 +34,7 @@
     </nav>
   <div class="container">
   <div class="row">
-    <section class="col-lg-3">
+    <aside class="col-lg-2">
 <nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
   <h3>Quick Start</h3>
   <ul class="sidebar-nav">
@@ -55,6 +50,11 @@
     <li class="sidebar-brand">
       <a href="../guide/why-enkan.html">
         Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/repl.html">
+        REPL-Driven Development
       </a>
     </li>
     <li class="sidebar-brand">
@@ -102,6 +102,21 @@
         Development tools
       </a>
     </li>
+    <li class="sidebar-brand">
+      <a href="../guide/testing.html">
+        Testing
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/deployment.html">
+        Deployment
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/spring-boot-comparison.html">
+        Spring Boot Comparison
+      </a>
+    </li>
   </ul>
 
   <h3>Reference</h3>
@@ -117,12 +132,11 @@
     </li>
   </ul>
 </nav>
-    </section>
-    <section class="col-lg-9">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12">
-          <h1><a href="#why-enkan" id="why-enkan">Why Enkan?</a></h1>
+    </aside>
+    <section class="col-lg-10">
+      <div class="row">
+        <div class="col-12">
+        <h1><a href="#why-enkan" id="why-enkan">Why Enkan?</a></h1>
 <p>Enkan is a minimal Java web framework inspired by <a href="https://github.com/ring-clojure/ring">Ring</a> (Clojure) and<br />
 <a href="https://github.com/senchalabs/connect">Connect</a> (Node.js).<br />
 It is built around one conviction: <strong>a web application should be explicit, traceable, and operable — not magical.</strong></p>
@@ -222,6 +236,36 @@ with a clear message — not a <code>NullPointerException</code> at request time
 <h3><a href="#built-in-request-tracing" id="built-in-request-tracing">Built-In Request Tracing</a></h3>
 <p><code>TraceMiddleware</code> records timestamps at each layer. The accumulated trace is written to the<br />
 <code>X-Enkan-Trace</code> response header, giving you a per-request flamegraph without external tooling.</p>
+<h3><a href="#repl-driven-development-with-domain-objects" id="repl-driven-development-with-domain-objects">REPL-Driven Development with Domain Objects</a></h3>
+<p>Enkan&rsquo;s REPL is not just for server control — it is a powerful tool for <strong>understanding and validating business logic interactively</strong>.</p>
+<p>Because Enkan enforces clean architecture, domain objects have no dependencies on framework layers (no <code>@Entity</code>, no <code>@Component</code>, no servlet API imports). This means you can instantiate and manipulate them directly in the REPL:</p>
+<pre><code>enkan&gt; var order = new Order(&quot;customer-123&quot;, List.of(
+           new OrderItem(&quot;SKU-001&quot;, 3),
+           new OrderItem(&quot;SKU-042&quot;, 1)));
+enkan&gt; order.totalAmount()
+$2 ==&gt; 4800
+
+enkan&gt; order.applyDiscount(DiscountPolicy.LOYALTY)
+enkan&gt; order.totalAmount()
+$4 ==&gt; 4320
+</code></pre>
+<p>This brings Clojure-style REPL-driven development to Java:</p>
+<ul>
+<li><strong>Explore domain logic</strong> — test business rules without writing a test class or starting the HTTP server. Verify edge cases by constructing objects with different states.</li>
+<li><strong>Validate understanding</strong> — new team members can learn the domain model by interacting with real objects, not just reading code. &ldquo;What happens when an order has zero items?&rdquo; — just try it.</li>
+<li><strong>Prototype with live data</strong> — since the REPL runs inside the same JVM as the application, you can access live components (database, cache) and query real data through your domain layer:</li>
+</ul>
+<pre><code>enkan&gt; var ds = system.getComponent(&quot;datasource&quot;)
+enkan&gt; var dao = new CustomerDao(ds)
+enkan&gt; var customer = dao.findById(42L)
+enkan&gt; customer.creditLimit()
+$3 ==&gt; 500000
+
+enkan&gt; var eligibility = LoanEligibility.evaluate(customer)
+enkan&gt; eligibility.reason()
+$5 ==&gt; &quot;Approved: credit score above threshold&quot;
+</code></pre>
+<p>In Spring Boot, domain objects often carry JPA annotations or depend on injected services, making standalone instantiation impractical. In Enkan, the separation is structural — domain objects are always plain Java, always testable, and always REPL-friendly.</p>
 <hr />
 <h2><a href="#ease-of-operation" id="ease-of-operation">Ease of Operation</a></h2>
 <h3><a href="#fast-startup" id="fast-startup">Fast Startup</a></h3>
@@ -248,7 +292,7 @@ or inspect internal state without redeployment.</p>
 <tr><td> Classpath scanning </td><td> None </td><td> Extensive </td><td> Build-time </td><td> None </td></tr>
 <tr><td> Middleware type safety </td><td> Compile-time (generics) </td><td> Runtime (Filter chain) </td><td> Runtime </td><td> Runtime </td></tr>
 <tr><td> Component lifecycle </td><td> Explicit graph </td><td> <code>@Bean</code> + <code>@Autowired</code> </td><td> CDI / <code>@ApplicationScoped</code> </td><td> Verticle </td></tr>
-<tr><td> REPL / live inspection </td><td> Built-in </td><td> Actuator (HTTP) </td><td> Dev UI </td><td> – </td></tr>
+<tr><td> REPL / live inspection </td><td> Built-in (JShell, domain objects) </td><td> Actuator (HTTP only) </td><td> Dev UI (browser only) </td><td> – </td></tr>
 <tr><td> Reactive / async </td><td> Opt-in </td><td> WebFlux opt-in </td><td> Reactive opt-in </td><td> Core feature </td></tr>
 <tr><td> Target scale </td><td> Small–medium apps </td><td> All scales </td><td> Cloud-native </td><td> High-concurrency </td></tr>
 </tbody>
@@ -268,7 +312,6 @@ It adds:</p>
 </ul>
 <p>Kotowari inherits Enkan&rsquo;s philosophy: it is explicit, thin, and composed entirely of middleware.</p>
 
-          </div>
         </div>
       </div>
     </section>
@@ -276,20 +319,18 @@ It adds:</p>
   </div>
     <footer>
       <div class="container">
-        <div class="col-lg-4">
-
-        </div>
-        <div class="col-lg-4 col-lg-offset-4">
-          © 2016 kawasima<br/>
-          Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+        <div class="row">
+          <div class="col-lg-4 offset-lg-8 text-end">
+            © 2016–2026 kawasima<br/>
+            Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+          </div>
         </div>
       </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
   </body>
 </html>

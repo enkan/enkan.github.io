@@ -6,32 +6,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
-
-    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
-    <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
-        <div class="navbar-header page-scroll">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="../index.html">enkan</a>
-        </div>
+        <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+          <img src="../img/logo.png" alt="enkan logo" class="navbar-logo">enkan
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bs-navbar-collapse-1" aria-controls="bs-navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-            <li class="hidden active"><a href="#page-top"></a></li>
-            <li class="page-scroll">
-              <a href="getting-started.html">Docs</a>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../getting-started.html">Docs</a>
             </li>
-            <li>
-              <a href="https://github.com/enkan/enkan">GitHub</a>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -39,7 +34,7 @@
     </nav>
   <div class="container">
   <div class="row">
-    <section class="col-lg-3">
+    <aside class="col-lg-2">
 <nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
   <h3>Quick Start</h3>
   <ul class="sidebar-nav">
@@ -55,6 +50,11 @@
     <li class="sidebar-brand">
       <a href="../guide/why-enkan.html">
         Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/repl.html">
+        REPL-Driven Development
       </a>
     </li>
     <li class="sidebar-brand">
@@ -102,6 +102,21 @@
         Development tools
       </a>
     </li>
+    <li class="sidebar-brand">
+      <a href="../guide/testing.html">
+        Testing
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/deployment.html">
+        Deployment
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/spring-boot-comparison.html">
+        Spring Boot Comparison
+      </a>
+    </li>
   </ul>
 
   <h3>Reference</h3>
@@ -117,19 +132,18 @@
     </li>
   </ul>
 </nav>
-    </section>
-    <section class="col-lg-9">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12">
-          <h1><a href="#authentication-and-authorization" id="authentication-and-authorization">Authentication and Authorization</a></h1>
+    </aside>
+    <section class="col-lg-10">
+      <div class="row">
+        <div class="col-12">
+        <h1><a href="#authentication-and-authorization" id="authentication-and-authorization">Authentication and Authorization</a></h1>
 <hr />
 <h2><a href="#how-authentication-works" id="how-authentication-works">How Authentication Works</a></h2>
 <p><code>AuthenticationMiddleware</code> runs a list of <code>AuthBackend</code> implementations in order.<br />
 Each backend gets a chance to parse the request and return a <code>Principal</code>.<br />
 The first non-null principal wins; remaining backends are skipped.</p>
 <p>The resolved principal is added to the request via the <code>PrincipalAvailable</code> mixin:</p>
-<pre><code class="language-language-java">app.use(new AuthenticationMiddleware&lt;&gt;(List.of(
+<pre><code class="language-java">app.use(new AuthenticationMiddleware&lt;&gt;(List.of(
     new SessionBackend(),
     new MyTokenBackend()
 )));
@@ -142,12 +156,12 @@ it does not throw or redirect. Enforcing access is the job of authorization (see
 <p>Reads a <code>Principal</code> stored under the key <code>&quot;principal&quot;</code> in the session.<br />
 Use this for classical login-form authentication where the principal is stored after a<br />
 successful credential check.</p>
-<pre><code class="language-language-java">// On login success — store the principal in the session
+<pre><code class="language-java">// On login success — store the principal in the session
 HttpResponse response = builder(redirect(&quot;/dashboard&quot;))
     .set(HttpResponse::setSession, Session.of(&quot;principal&quot;, new UserPrincipal(user)))
     .build();
 </code></pre>
-<pre><code class="language-language-java">// Register the backend
+<pre><code class="language-java">// Register the backend
 app.use(new AuthenticationMiddleware&lt;&gt;(List.of(new SessionBackend())));
 </code></pre>
 <p><code>SessionBackend</code> requires <code>SessionMiddleware</code> to run first (it reads from <code>request.getSession()</code>).</p>
@@ -157,7 +171,7 @@ app.use(new AuthenticationMiddleware&lt;&gt;(List.of(new SessionBackend())));
 </code></pre>
 <p><code>TokenBackend.authenticate()</code> returns <code>null</code> by default — you must subclass it and implement<br />
 your own token verification:</p>
-<pre><code class="language-language-java">public class JwtTokenBackend extends TokenBackend {
+<pre><code class="language-java">public class JwtTokenBackend extends TokenBackend {
     private final JwtVerifier verifier;
 
     public JwtTokenBackend(JwtVerifier verifier) {
@@ -176,7 +190,7 @@ your own token verification:</p>
 <hr />
 <h2><a href="#implementing-a-custom-backend" id="implementing-a-custom-backend">Implementing a Custom Backend</a></h2>
 <p>Implement <code>AuthBackend&lt;REQ, T&gt;</code>:</p>
-<pre><code class="language-language-java">public class BasicAuthBackend implements AuthBackend&lt;HttpRequest, UsernamePassword&gt; {
+<pre><code class="language-java">public class BasicAuthBackend implements AuthBackend&lt;HttpRequest, UsernamePassword&gt; {
 
     private final UserRepository users;
 
@@ -204,7 +218,7 @@ backend does not apply to this request&rdquo; and the next backend is tried.</p>
 <h2><a href="#reading-the-principal-in-a-controller" id="reading-the-principal-in-a-controller">Reading the Principal in a Controller</a></h2>
 <p>When <code>AuthenticationMiddleware</code> has run, the request implements <code>PrincipalAvailable</code>.<br />
 Kotowari injects the principal as a method argument:</p>
-<pre><code class="language-language-java">public HttpResponse profile(UserPrincipal principal) {
+<pre><code class="language-java">public HttpResponse profile(UserPrincipal principal) {
     if (principal == null) {
         return redirect(&quot;/login&quot;);
     }
@@ -212,7 +226,7 @@ Kotowari injects the principal as a method argument:</p>
 }
 </code></pre>
 <p>Or via the <code>@Inject</code>-based session approach for form-based login:</p>
-<pre><code class="language-language-java">public HttpResponse dashboard(UserPrincipal principal) {
+<pre><code class="language-java">public HttpResponse dashboard(UserPrincipal principal) {
     return templateEngine.render(&quot;dashboard&quot;, &quot;principal&quot;, principal);
 }
 </code></pre>
@@ -221,7 +235,7 @@ Kotowari injects the principal as a method argument:</p>
 <p>Enkan does not provide a dedicated authorization middleware.<br />
 Instead, use <strong>predicates</strong> to restrict access before the protected middleware even runs.</p>
 <h3><a href="#redirect-unauthenticated-users" id="redirect-unauthenticated-users">Redirect unauthenticated users</a></h3>
-<pre><code class="language-language-java">app.use(
+<pre><code class="language-java">app.use(
     and(path(&quot;^/admin/&quot;), authenticated().negate()),
     (Endpoint&lt;HttpRequest, HttpResponse&gt;) req -&gt;
         redirect(&quot;/login?url=&quot; + req.getUri(), TEMPORARY_REDIRECT)
@@ -229,7 +243,7 @@ Instead, use <strong>predicates</strong> to restrict access before the protected
 </code></pre>
 <h3><a href="#restrict-by-permission" id="restrict-by-permission">Restrict by permission</a></h3>
 <p>If your <code>Principal</code> implements a permission check, wrap it in a custom predicate:</p>
-<pre><code class="language-language-java">public class HasPermission implements Predicate&lt;HttpRequest&gt; {
+<pre><code class="language-java">public class HasPermission implements Predicate&lt;HttpRequest&gt; {
     private final String permission;
 
     public HasPermission(String permission) {
@@ -246,7 +260,7 @@ Instead, use <strong>predicates</strong> to restrict access before the protected
     }
 }
 </code></pre>
-<pre><code class="language-language-java">app.use(
+<pre><code class="language-java">app.use(
     and(path(&quot;^/admin/&quot;), new HasPermission(&quot;ADMIN&quot;).negate()),
     (Endpoint&lt;HttpRequest, HttpResponse&gt;) req -&gt;
         HttpResponse.of(403, &quot;Forbidden&quot;)
@@ -265,7 +279,6 @@ Instead, use <strong>predicates</strong> to restrict access before the protected
 </tbody>
 </table>
 
-          </div>
         </div>
       </div>
     </section>
@@ -273,20 +286,18 @@ Instead, use <strong>predicates</strong> to restrict access before the protected
   </div>
     <footer>
       <div class="container">
-        <div class="col-lg-4">
-
-        </div>
-        <div class="col-lg-4 col-lg-offset-4">
-          © 2016 kawasima<br/>
-          Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+        <div class="row">
+          <div class="col-lg-4 offset-lg-8 text-end">
+            © 2016–2026 kawasima<br/>
+            Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+          </div>
         </div>
       </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
   </body>
 </html>

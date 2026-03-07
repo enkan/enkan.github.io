@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset=utf-8"/>
+    <title>Spring Boot Comparison | Enkan</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
+  </head>
+  <body id="page-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+          <img src="../img/logo.png" alt="enkan logo" class="navbar-logo">enkan
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bs-navbar-collapse-1" aria-controls="bs-navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../getting-started.html">Docs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/enkan/enkan">GitHub</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  <div class="container">
+  <div class="row">
+    <aside class="col-lg-2">
+<nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
+  <h3>Quick Start</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../getting-started.html">
+        Getting Started
+      </a>
+    </li>
+  </ul>
+
+  <h3>Guide</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../guide/why-enkan.html">
+        Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/repl.html">
+        REPL-Driven Development
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/enkan-system.html">
+        Enkan system
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/application-factory.html">
+        Application factory
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/controller.html">
+        Controller
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/content-negotiation.html">
+        Content negotiation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/session.html">
+        Session
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/conversation.html">
+        Conversation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/authentication.html">
+        Authentication
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/file-uploading.html">
+        File uploading
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/development.html">
+        Development tools
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/testing.html">
+        Testing
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/deployment.html">
+        Deployment
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/spring-boot-comparison.html">
+        Spring Boot Comparison
+      </a>
+    </li>
+  </ul>
+
+  <h3>Reference</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../reference/middlewares.html">Middleware</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/components.html">Components</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/repl.html">REPL commands</a>
+    </li>
+  </ul>
+</nav>
+    </aside>
+    <section class="col-lg-10">
+      <div class="row">
+        <div class="col-12">
+        <h1><a href="#spring-boot-enkan-comparison" id="spring-boot-enkan-comparison">Spring Boot → Enkan Comparison</a></h1>
+<p>This guide shows how common Spring Boot patterns map to Enkan/Kotowari equivalents.<br />
+It is not a feature-by-feature comparison — it highlights the <strong>difference in philosophy</strong>.</p>
+<hr />
+<h2><a href="#1-dependency-injection-component-wiring" id="1-dependency-injection-component-wiring">1. Dependency Injection / Component Wiring</a></h2>
+<h3><a href="#spring-boot" id="spring-boot">Spring Boot</a></h3>
+<pre><code class="language-java">@Configuration
+public class AppConfig {
+    @Bean
+    public DataSource dataSource() {
+        return new HikariDataSource(hikariConfig);
+    }
+}
+
+@Service
+public class UserService {
+    @Autowired
+    private DataSource dataSource;
+}
+</code></pre>
+<h3><a href="#enkan" id="enkan">Enkan</a></h3>
+<pre><code class="language-java">EnkanSystem.of(
+    &quot;datasource&quot;, new HikariCPComponent(),
+    &quot;doma&quot;,       new DomaProvider(),
+    &quot;app&quot;,        new ApplicationComponent(&quot;com.example.MyAppFactory&quot;),
+    &quot;http&quot;,       new UndertowComponent()
+).relationships(
+    component(&quot;http&quot;).using(&quot;app&quot;),
+    component(&quot;app&quot;).using(&quot;doma&quot;, &quot;datasource&quot;),
+    component(&quot;doma&quot;).using(&quot;datasource&quot;)
+);
+</code></pre>
+<p><strong>Key difference:</strong> No classpath scanning, no <code>@Component</code> discovery. The dependency graph is a single block of Java code — you can read the entire wiring at a glance. Components are started in dependency order and stopped in reverse.</p>
+<hr />
+<h2><a href="#2-request-pipeline" id="2-request-pipeline">2. Request Pipeline</a></h2>
+<h3><a href="#spring-boot" id="spring-boot">Spring Boot</a></h3>
+<pre><code class="language-java">@Component
+public class LoggingFilter implements Filter {
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse res,
+                         FilterChain chain) throws IOException, ServletException {
+        // before
+        chain.doFilter(req, res);
+        // after
+    }
+}
+</code></pre>
+<p>Filter ordering is controlled by <code>@Order</code> or <code>FilterRegistrationBean</code>.</p>
+<h3><a href="#enkan" id="enkan">Enkan</a></h3>
+<pre><code class="language-java">app.use(new DefaultCharsetMiddleware());
+app.use(new MetricsMiddleware&lt;&gt;());
+app.use(new SessionMiddleware());
+app.use(new RoutingMiddleware());
+</code></pre>
+<p><strong>Key difference:</strong> Middleware ordering is explicit — the order you write <code>app.use()</code> is the order they execute. No annotation-driven ordering surprises. Middleware can also declare <code>@Middleware(dependencies = {...})</code> so the framework rejects invalid orderings at startup.</p>
+<hr />
+<h2><a href="#3-routing" id="3-routing">3. Routing</a></h2>
+<h3><a href="#spring-boot" id="spring-boot">Spring Boot</a></h3>
+<pre><code class="language-java">@RestController
+@RequestMapping(&quot;/users&quot;)
+public class UserController {
+    @GetMapping
+    public List&lt;User&gt; list() { ... }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public User show(@PathVariable Long id) { ... }
+
+    @PostMapping
+    public User create(@RequestBody User user) { ... }
+}
+</code></pre>
+<h3><a href="#enkan-kotowari" id="enkan-kotowari">Enkan (Kotowari)</a></h3>
+<pre><code class="language-java">Routes routes = Routes.define(r -&gt; {
+    r.get(&quot;/&quot;).to(HomeController.class, &quot;index&quot;);
+    r.resource(UserController.class);
+    r.scope(&quot;/admin&quot;, admin -&gt; {
+        admin.resource(AdminUserController.class);
+    });
+}).compile();
+</code></pre>
+<p>The controller is a plain class — no annotations on methods:</p>
+<pre><code class="language-java">public class UserController {
+    @Inject
+    private DomaProvider daoProvider;
+
+    public HttpResponse index() {
+        UserDao dao = daoProvider.getDao(UserDao.class);
+        return templateEngine.render(&quot;user/index&quot;, &quot;users&quot;, dao.findAll());
+    }
+
+    public HttpResponse show(Parameters params) {
+        Long id = params.getLong(&quot;id&quot;);
+        // ...
+    }
+}
+</code></pre>
+<p><strong>Key difference:</strong> Routes are defined centrally in Java code, not scattered across controller annotations. <code>r.resource(Controller.class)</code> generates RESTful routes (index, show, newForm, create, edit, update, delete) similar to Rails.</p>
+<hr />
+<h2><a href="#4-configuration" id="4-configuration">4. Configuration</a></h2>
+<h3><a href="#spring-boot" id="spring-boot">Spring Boot</a></h3>
+<pre><code class="language-yaml"># application.yml
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost/mydb
+</code></pre>
+<pre><code class="language-java">@Value(&quot;${server.port}&quot;)
+private int port;
+</code></pre>
+<h3><a href="#enkan" id="enkan">Enkan</a></h3>
+<pre><code class="language-java">public class MySystemFactory implements SystemFactory {
+    @Override
+    public EnkanSystem create() {
+        return EnkanSystem.of(
+            &quot;datasource&quot;, new HikariCPComponent(),
+            &quot;http&quot;,       new UndertowComponent()
+        );
+    }
+}
+</code></pre>
+<p>Component properties are set via Java setters or constructor arguments.</p>
+<p><strong>Key difference:</strong> No YAML, no <code>.properties</code>, no <code>@Value</code>. Everything is Java code — your IDE can refactor, navigate, and statically analyse the entire configuration. There is no runtime string-key lookup that can fail silently.</p>
+<hr />
+<h2><a href="#5-session" id="5-session">5. Session</a></h2>
+<h3><a href="#spring-boot" id="spring-boot">Spring Boot</a></h3>
+<pre><code class="language-java">@GetMapping(&quot;/dashboard&quot;)
+public String dashboard(HttpSession session) {
+    session.setAttribute(&quot;visited&quot;, true);
+    return &quot;dashboard&quot;;
+}
+</code></pre>
+<h3><a href="#enkan" id="enkan">Enkan</a></h3>
+<pre><code class="language-java">public HttpResponse dashboard(Session session) {
+    session.put(&quot;visited&quot;, true);
+    return builder(templateEngine.render(&quot;dashboard&quot;))
+        .set(HttpResponse::setSession, session)
+        .build();
+}
+</code></pre>
+<p><strong>Key difference:</strong> In Enkan, session changes must be explicitly attached to the response. Mutating the request-side session object alone does <strong>not</strong> persist changes. This makes session writes visible and intentional.</p>
+<p>Also, <code>SessionMiddleware</code> must be explicitly registered — <code>getSession()</code> does not exist on the request until it runs.</p>
+<hr />
+<h2><a href="#6-authentication-authorization" id="6-authentication-authorization">6. Authentication &amp; Authorization</a></h2>
+<h3><a href="#spring-boot-spring-security" id="spring-boot-spring-security">Spring Boot (Spring Security)</a></h3>
+<pre><code class="language-java">@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(auth -&gt; auth
+            .requestMatchers(&quot;/admin/**&quot;).hasRole(&quot;ADMIN&quot;)
+            .anyRequest().authenticated()
+        ).formLogin(withDefaults());
+        return http.build();
+    }
+}
+</code></pre>
+<h3><a href="#enkan" id="enkan">Enkan</a></h3>
+<pre><code class="language-java">// Authentication — register backends
+app.use(new AuthenticationMiddleware&lt;&gt;(List.of(
+    new SessionBackend(),
+    new MyTokenBackend()
+)));
+
+// Authorization — use predicates
+app.use(
+    and(path(&quot;^/admin/&quot;), authenticated().negate()),
+    (Endpoint&lt;HttpRequest, HttpResponse&gt;) req -&gt;
+        redirect(&quot;/login&quot;, TEMPORARY_REDIRECT)
+);
+</code></pre>
+<p><strong>Key difference:</strong> Enkan separates authentication (who are you?) from authorization (can you access this?) using different mechanisms. Authentication is middleware with pluggable backends. Authorization is just predicates — the same predicate system used for all middleware conditions. There is no &ldquo;security filter chain&rdquo; abstraction.</p>
+<hr />
+<h2><a href="#7-validation" id="7-validation">7. Validation</a></h2>
+<h3><a href="#spring-boot" id="spring-boot">Spring Boot</a></h3>
+<pre><code class="language-java">@PostMapping(&quot;/users&quot;)
+public String create(@Valid @ModelAttribute UserForm form,
+                     BindingResult result) {
+    if (result.hasErrors()) {
+        return &quot;user/form&quot;;
+    }
+    // ...
+}
+</code></pre>
+<h3><a href="#enkan-kotowari" id="enkan-kotowari">Enkan (Kotowari)</a></h3>
+<pre><code class="language-java">// Middleware stack
+app.use(new ValidateBodyMiddleware());
+
+// Form class with JSR 303 annotations
+public class CustomerForm extends FormBase {
+    @NotBlank
+    @Size(max = 10)
+    private String name;
+
+    @Email
+    private String email;
+}
+
+// Controller — validation errors are available via the form
+public HttpResponse create(CustomerForm form) {
+    if (form.hasErrors()) {
+        return templateEngine.render(&quot;customer/new&quot;, &quot;customer&quot;, form);
+    }
+    // ...
+}
+</code></pre>
+<p><strong>Key difference:</strong> Validation is a middleware concern, not an annotation on the controller method. <code>ValidateBodyMiddleware</code> runs JSR 303 validation before the controller is invoked. The form object carries both data and errors.</p>
+<hr />
+<h2><a href="#8-template-rendering" id="8-template-rendering">8. Template Rendering</a></h2>
+<h3><a href="#spring-boot" id="spring-boot">Spring Boot</a></h3>
+<pre><code class="language-java">@GetMapping(&quot;/users&quot;)
+public String list(Model model) {
+    model.addAttribute(&quot;users&quot;, userService.findAll());
+    return &quot;user/list&quot;;  // resolves to templates/user/list.html
+}
+</code></pre>
+<h3><a href="#enkan-kotowari" id="enkan-kotowari">Enkan (Kotowari)</a></h3>
+<pre><code class="language-java">@Inject
+private TemplateEngine templateEngine;
+
+public HttpResponse list() {
+    List&lt;User&gt; users = dao.findAll();
+    return templateEngine.render(&quot;user/list&quot;, &quot;users&quot;, users);
+}
+</code></pre>
+<p><strong>Key difference:</strong> The controller returns an <code>HttpResponse</code> directly, not a view name string. There is no implicit model — template variables are passed explicitly. The template engine (Freemarker, Thymeleaf, etc.) is injected as a component.</p>
+<hr />
+<h2><a href="#9-database-transactions" id="9-database-transactions">9. Database / Transactions</a></h2>
+<h3><a href="#spring-boot" id="spring-boot">Spring Boot</a></h3>
+<pre><code class="language-java">@Service
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+
+    @Transactional
+    public void createUser(User user) {
+        userRepository.save(user);
+    }
+}
+</code></pre>
+<h3><a href="#enkan-with-doma" id="enkan-with-doma">Enkan (with Doma)</a></h3>
+<pre><code class="language-java">// Middleware — wraps request in a transaction
+app.use(new DomaTransactionMiddleware&lt;&gt;());
+
+// Controller
+@Inject
+private DomaProvider daoProvider;
+
+public HttpResponse create(CustomerForm form) {
+    CustomerDao dao = daoProvider.getDao(CustomerDao.class);
+    dao.insert(form.toEntity());
+    return redirect(&quot;/customers&quot;);
+}
+</code></pre>
+<p><strong>Key difference:</strong> Transactions are middleware, not annotations on service methods. The entire request is wrapped in a transaction by <code>DomaTransactionMiddleware</code>. There is no <code>@Transactional</code> — the middleware stack makes it clear which requests are transactional.</p>
+<hr />
+<h2><a href="#10-static-resources" id="10-static-resources">10. Static Resources</a></h2>
+<h3><a href="#spring-boot" id="spring-boot">Spring Boot</a></h3>
+<p>Files in <code>src/main/resources/static/</code> are automatically served at <code>/</code>.</p>
+<h3><a href="#enkan" id="enkan">Enkan</a></h3>
+<pre><code class="language-java">app.use(new ResourceMiddleware());
+</code></pre>
+<p>Serves files from <code>src/main/resources/public/</code> when registered. If you don&rsquo;t register <code>ResourceMiddleware</code>, no static files are served.</p>
+<p><strong>Key difference:</strong> Nothing is automatic. Static file serving is opt-in middleware.</p>
+<hr />
+<h2><a href="#11-development" id="11-development">11. Development</a></h2>
+<h3><a href="#spring-boot-devtools" id="spring-boot-devtools">Spring Boot (DevTools)</a></h3>
+<ul>
+<li><code>spring-boot-devtools</code> on classpath enables auto-restart</li>
+<li>Full JVM restart on class changes (~2-5 seconds)</li>
+<li>LiveReload for static resources</li>
+</ul>
+<h3><a href="#enkan-repl" id="enkan-repl">Enkan (REPL)</a></h3>
+<pre><code>enkan&gt; /reset              # hot-reload application (~1 second)
+enkan&gt; /middleware app list # inspect middleware stack
+enkan&gt; /routes app         # inspect routing table
+</code></pre>
+<p><strong>Key difference:</strong> Enkan reloads only the application layer, not the JVM. Database pools, template engines, and other long-initialisation components stay alive. The REPL also lets you inspect and modify the running system (toggle middleware predicates, check routes, etc.) — not just restart it.</p>
+<hr />
+<h2><a href="#12-testing" id="12-testing">12. Testing</a></h2>
+<h3><a href="#spring-boot" id="spring-boot">Spring Boot</a></h3>
+<pre><code class="language-java">@SpringBootTest
+@AutoConfigureMockMvc
+class UserControllerTest {
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    void listUsers() throws Exception {
+        mockMvc.perform(get(&quot;/users&quot;))
+            .andExpect(status().isOk())
+            .andExpect(view().name(&quot;user/list&quot;));
+    }
+}
+</code></pre>
+<h3><a href="#enkan" id="enkan">Enkan</a></h3>
+<pre><code class="language-java">class UserControllerTest {
+    @Test
+    void listUsers() {
+        UserController controller = new UserController();
+        // inject mock dependencies directly
+        controller.templateEngine = new MockTemplateEngine();
+        controller.daoProvider = new MockDomaProvider();
+
+        HttpResponse response = controller.list();
+        assertThat(response).isNotNull();
+    }
+}
+</code></pre>
+<p><strong>Key difference:</strong> Controllers are plain classes — no container bootstrap needed. You instantiate them directly, inject mock dependencies, and call methods. No <code>@SpringBootTest</code>, no <code>MockMvc</code>, no application context startup. For integration tests, you can compose a minimal middleware stack and send requests through it.</p>
+<hr />
+<h2><a href="#summary" id="summary">Summary</a></h2>
+<table>
+<thead>
+<tr><th> Concern </th><th> Spring Boot </th><th> Enkan </th></tr>
+</thead>
+<tbody>
+<tr><td> Philosophy </td><td> Convention over configuration </td><td> Explicitness over magic </td></tr>
+<tr><td> Configuration </td><td> YAML + annotations </td><td> Java code only </td></tr>
+<tr><td> DI </td><td> <code>@Autowired</code>, classpath scanning </td><td> <code>EnkanSystem.of()</code> + <code>relationships()</code> </td></tr>
+<tr><td> Request pipeline </td><td> <code>Filter</code> + <code>@Order</code> </td><td> <code>app.use()</code> in order </td></tr>
+<tr><td> Routing </td><td> <code>@GetMapping</code> on methods </td><td> <code>Routes.define()</code> centrally </td></tr>
+<tr><td> Session </td><td> <code>HttpSession</code> (mutable, implicit) </td><td> Response-side session (explicit) </td></tr>
+<tr><td> Auth </td><td> Spring Security filter chain </td><td> <code>AuthBackend</code> + predicates </td></tr>
+<tr><td> Transactions </td><td> <code>@Transactional</code> </td><td> <code>DomaTransactionMiddleware</code> </td></tr>
+<tr><td> Dev reload </td><td> JVM restart (~2-5s) </td><td> Application reload (~1s) </td></tr>
+<tr><td> Testing </td><td> <code>@SpringBootTest</code> + <code>MockMvc</code> </td><td> Plain class instantiation </td></tr>
+</tbody>
+</table>
+
+        </div>
+      </div>
+    </section>
+  </div>
+  </div>
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 offset-lg-8 text-end">
+            © 2016–2026 kawasima<br/>
+            Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
+  </body>
+</html>

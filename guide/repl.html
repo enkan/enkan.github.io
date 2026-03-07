@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset=utf-8"/>
+    <title>REPL-Driven Development | Enkan</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
+  </head>
+  <body id="page-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+          <img src="../img/logo.png" alt="enkan logo" class="navbar-logo">enkan
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bs-navbar-collapse-1" aria-controls="bs-navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../getting-started.html">Docs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/enkan/enkan">GitHub</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  <div class="container">
+  <div class="row">
+    <aside class="col-lg-2">
+<nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
+  <h3>Quick Start</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../getting-started.html">
+        Getting Started
+      </a>
+    </li>
+  </ul>
+
+  <h3>Guide</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../guide/why-enkan.html">
+        Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/repl.html">
+        REPL-Driven Development
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/enkan-system.html">
+        Enkan system
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/application-factory.html">
+        Application factory
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/controller.html">
+        Controller
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/content-negotiation.html">
+        Content negotiation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/session.html">
+        Session
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/conversation.html">
+        Conversation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/authentication.html">
+        Authentication
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/file-uploading.html">
+        File uploading
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/development.html">
+        Development tools
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/testing.html">
+        Testing
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/deployment.html">
+        Deployment
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/spring-boot-comparison.html">
+        Spring Boot Comparison
+      </a>
+    </li>
+  </ul>
+
+  <h3>Reference</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../reference/middlewares.html">Middleware</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/components.html">Components</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/repl.html">REPL commands</a>
+    </li>
+  </ul>
+</nav>
+    </aside>
+    <section class="col-lg-10">
+      <div class="row">
+        <div class="col-12">
+        <h1><a href="#repl-driven-development" id="repl-driven-development">REPL-Driven Development</a></h1>
+<p>One of Enkan&rsquo;s most distinctive features is its built-in REPL (Read-Eval-Print Loop).<br />
+Unlike typical Java development cycles that require a full JVM restart for every change,<br />
+Enkan&rsquo;s REPL lets you start, stop, and reload the application while the JVM stays running —<br />
+and gives you a live interactive shell into the running system.</p>
+<hr />
+<h2><a href="#what-the-repl-is" id="what-the-repl-is">What the REPL Is</a></h2>
+<p>The Enkan REPL is a JShell-based interactive environment that runs inside the same JVM as<br />
+your application. It is not just a control console — it is a full Java expression evaluator.<br />
+You can:</p>
+<ul>
+<li>Start and stop the HTTP server with a command</li>
+<li>Reload application code in ~1 second without restarting the JVM</li>
+<li>Inspect the live middleware stack and routing table</li>
+<li>Execute arbitrary Java expressions against live components (database, cache, etc.)</li>
+<li>Test domain objects interactively without writing test classes</li>
+</ul>
+<hr />
+<h2><a href="#starting-the-repl" id="starting-the-repl">Starting the REPL</a></h2>
+<p>Bootstrap the REPL from your <code>main</code> method:</p>
+<pre><code class="language-java">import enkan.system.repl.JShellRepl;
+import enkan.system.repl.ReplBoot;
+import kotowari.system.KotowariCommandRegister;
+
+public class DevMain {
+    public static void main(String[] args) {
+        JShellRepl repl = new JShellRepl(MySystemFactory.class.getName());
+
+        new ReplBoot(repl)
+                .register(new KotowariCommandRegister())
+                .onReady(&quot;/start&quot;)
+                .start();
+    }
+}
+</code></pre>
+<p>Run it:</p>
+<pre><code class="language-bash">% mvn -e compile exec:java -Dexec.mainClass=com.example.DevMain
+</code></pre>
+<p>The REPL starts, executes <code>/start</code> automatically, and presents a prompt:</p>
+<pre><code class="language-bash">enkan&gt;
+</code></pre>
+<hr />
+<h2><a href="#the-basic-development-loop" id="the-basic-development-loop">The Basic Development Loop</a></h2>
+<pre><code class="language-bash">enkan&gt; /start                   # start the HTTP server
+System started.
+
+# ... edit Java source files in your IDE ...
+# ... IDE compiles to target/classes/ ...
+
+enkan&gt; /reset                   # reload changed classes, restart app layer
+System reset in 743ms.          # DB pool, caches — still alive
+
+enkan&gt; /stop                    # graceful shutdown
+System stopped.
+</code></pre>
+<p><code>/reset</code> discards and recreates the application <code>ClassLoader</code>, picking up any recompiled<br />
+<code>.class</code> files from <code>target/classes/</code>. Long-lived components (connection pools, caches)<br />
+are <strong>not</strong> restarted unless they depend on the application layer.</p>
+<h3><a href="#automatic-reset-on-file-change" id="automatic-reset-on-file-change">Automatic reset on file change</a></h3>
+<p>Register the <code>/autoreset</code> command to watch for compiled class changes:</p>
+<pre><code class="language-java">new ReplBoot(repl)
+        .register(new KotowariCommandRegister())
+        .register(r -&gt; r.registerLocalCommand(&quot;autoreset&quot;, new AutoResetCommand(repl)))
+        .start();
+</code></pre>
+<pre><code class="language-bash">enkan&gt; /autoreset
+Start to watch modification of an application.
+
+# Now just save + compile in your IDE — the app resets automatically
+</code></pre>
+<hr />
+<h2><a href="#inspecting-the-live-system" id="inspecting-the-live-system">Inspecting the Live System</a></h2>
+<h3><a href="#middleware-stack" id="middleware-stack">Middleware stack</a></h3>
+<pre><code class="language-bash">enkan&gt; /middleware app list
+ANY   defaultCharset   (enkan.middleware.DefaultCharsetMiddleware@4929dbc3)
+ANY   trace            (enkan.middleware.TraceMiddleware@1c985ffd)
+ANY   session          (enkan.middleware.SessionMiddleware@32424a32)
+ANY   routing          (kotowari.middleware.RoutingMiddleware@226c7147)
+ANY   controllerInvoker (kotowari.middleware.ControllerInvokerMiddleware@5f4da5c3)
+</code></pre>
+<h3><a href="#routing-table" id="routing-table">Routing table</a></h3>
+<pre><code class="language-bash">enkan&gt; /routes app
+GET    /                       HomeController#index
+GET    /customers               CustomerController#index
+GET    /customers/:id           CustomerController#show
+POST   /customers               CustomerController#create
+</code></pre>
+<h3><a href="#metrics" id="metrics">Metrics</a></h3>
+<pre><code class="language-bash">enkan&gt; /metrics
+requests.count = 142
+requests.mean_rate = 3.21/s
+requests.p99 = 12.4ms
+</code></pre>
+<hr />
+<h2><a href="#live-java-evaluation" id="live-java-evaluation">Live Java Evaluation</a></h2>
+<p>The REPL is a full JShell session. Every component in the system is accessible via the<br />
+<code>system</code> variable, which is bound to your running <code>EnkanSystem</code> instance.</p>
+<h3><a href="#query-live-data-through-your-domain-layer" id="query-live-data-through-your-domain-layer">Query live data through your domain layer</a></h3>
+<pre><code class="language-bash">enkan&gt; var ds = system.getComponent(&quot;datasource&quot;, HikariCPComponent.class)
+enkan&gt; var dao = new CustomerDao(ds.getDataSource())
+enkan&gt; dao.findById(42L)
+$3 ==&gt; Customer{id=42, name=&quot;Alice&quot;, email=&quot;alice@example.com&quot;}
+</code></pre>
+<h3><a href="#test-business-logic-without-http" id="test-business-logic-without-http">Test business logic without HTTP</a></h3>
+<pre><code class="language-bash">enkan&gt; var order = new Order(&quot;customer-42&quot;, List.of(new OrderItem(&quot;SKU-001&quot;, 3)))
+enkan&gt; order.totalAmount()
+$5 ==&gt; 4800
+
+enkan&gt; order.applyDiscount(DiscountPolicy.LOYALTY)
+enkan&gt; order.totalAmount()
+$7 ==&gt; 4320
+</code></pre>
+<h3><a href="#toggle-maintenance-mode-live" id="toggle-maintenance-mode-live">Toggle maintenance mode live</a></h3>
+<pre><code class="language-bash">enkan&gt; /middleware app predicate serviceUnavailable ANY
+# All requests now return 503 — no redeploy needed
+
+enkan&gt; /middleware app predicate serviceUnavailable NONE
+# Back to normal
+</code></pre>
+<hr />
+<h2><a href="#connecting-to-a-remote-process" id="connecting-to-a-remote-process">Connecting to a Remote Process</a></h2>
+<p>The REPL server listens on a ZeroMQ port (random by default; set <code>repl.port</code> to fix it).<br />
+A separate client process can attach to a running application — useful for production<br />
+inspection without a restart.</p>
+<h3><a href="#server-side-your-application" id="server-side-your-application">Server side (your application)</a></h3>
+<pre><code class="language-java">JShellRepl repl = new JShellRepl(MySystemFactory.class.getName());
+new ReplBoot(repl).start();
+// Logs: &quot;Listen 64815&quot;
+</code></pre>
+<p>Or fix the port:</p>
+<pre><code class="language-bash">java -Drepl.port=64815 -jar myapp.jar
+</code></pre>
+<h3><a href="#client-side" id="client-side">Client side</a></h3>
+<pre><code class="language-bash"># From the enkan-repl-client JAR
+java -jar enkan-repl-client.jar 64815
+Connected to server (port = 64815)
+enkan&gt; /metrics
+</code></pre>
+<p>Or from within another REPL session:</p>
+<pre><code class="language-bash">enkan&gt; /connect 64815
+Connected to server (port = 64815)
+</code></pre>
+<p>Remote connections can run any registered command. Arbitrary JShell expressions are<br />
+restricted to local connections for security.</p>
+<hr />
+<h2><a href="#available-commands" id="available-commands">Available Commands</a></h2>
+<p>See the <a href="../reference/repl.html">REPL Commands reference</a> for the full list of built-in,<br />
+Kotowari, Devel, and Metrics commands.</p>
+
+        </div>
+      </div>
+    </section>
+  </div>
+  </div>
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 offset-lg-8 text-end">
+            © 2016–2026 kawasima<br/>
+            Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
+  </body>
+</html>

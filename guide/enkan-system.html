@@ -6,32 +6,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
-
-    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
-    <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
-        <div class="navbar-header page-scroll">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="../index.html">enkan</a>
-        </div>
+        <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+          <img src="../img/logo.png" alt="enkan logo" class="navbar-logo">enkan
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bs-navbar-collapse-1" aria-controls="bs-navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-            <li class="hidden active"><a href="#page-top"></a></li>
-            <li class="page-scroll">
-              <a href="getting-started.html">Docs</a>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../getting-started.html">Docs</a>
             </li>
-            <li>
-              <a href="https://github.com/enkan/enkan">GitHub</a>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -39,7 +34,7 @@
     </nav>
   <div class="container">
   <div class="row">
-    <section class="col-lg-3">
+    <aside class="col-lg-2">
 <nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
   <h3>Quick Start</h3>
   <ul class="sidebar-nav">
@@ -55,6 +50,11 @@
     <li class="sidebar-brand">
       <a href="../guide/why-enkan.html">
         Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/repl.html">
+        REPL-Driven Development
       </a>
     </li>
     <li class="sidebar-brand">
@@ -102,6 +102,21 @@
         Development tools
       </a>
     </li>
+    <li class="sidebar-brand">
+      <a href="../guide/testing.html">
+        Testing
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/deployment.html">
+        Deployment
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/spring-boot-comparison.html">
+        Spring Boot Comparison
+      </a>
+    </li>
   </ul>
 
   <h3>Reference</h3>
@@ -117,24 +132,23 @@
     </li>
   </ul>
 </nav>
-    </section>
-    <section class="col-lg-9">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12">
-          <h1><a href="#enkan-system" id="enkan-system">Enkan System</a></h1>
+    </aside>
+    <section class="col-lg-10">
+      <div class="row">
+        <div class="col-12">
+        <h1><a href="#enkan-system" id="enkan-system">Enkan System</a></h1>
 <p>Enkan system is a container of components for managing the lifecycle and dependencies.<br />
 It&rsquo;s inspired by <a href="https://github.com/stuartsierra/component">clojure component</a>.</p>
 <h2><a href="#usage" id="usage">Usage</a></h2>
 <p>Enkan system is composed of components.</p>
-<pre><code class="language-language-java">EnkanSystem system = EnkanSystem.of(
+<pre><code class="language-java">EnkanSystem system = EnkanSystem.of(
     &quot;http&quot;, new UndertowComponent()
 );
 </code></pre>
 <p>Using <code>of</code> method, components are registered to Enkan system.</p>
 <h3><a href="#creating-components" id="creating-components">Creating components</a></h3>
 <p>Components must be extended <code>SystemComponent</code> class. And implements <code>ComponentLifecycle</code>.</p>
-<pre><code class="language-language-java">class SomeComponent extends SystemComponent {
+<pre><code class="language-java">class SomeComponent extends SystemComponent {
     @Override
     protected ComponentLifecycle&lt;SomeComponent&gt; lifecycle() {
         return new ComponentLifecycle&lt;SomeComponent&gt;() {
@@ -153,7 +167,7 @@ It&rsquo;s inspired by <a href="https://github.com/stuartsierra/component">cloju
 So all components are started and stopped safely.</p>
 <h3><a href="#relationships-between-components" id="relationships-between-components">Relationships between components</a></h3>
 <p>Components often depend on each other. For example, an application component needs a template engine and a database provider, and the database provider itself needs a datasource. You declare these relationships with <code>relationships()</code>:</p>
-<pre><code class="language-language-java">system.relationships(
+<pre><code class="language-java">system.relationships(
     component(&quot;http&quot;).using(&quot;app&quot;),
     component(&quot;app&quot;).using(&quot;template&quot;, &quot;doma&quot;, &quot;datasource&quot;),
     component(&quot;doma&quot;).using(&quot;datasource&quot;),
@@ -172,11 +186,11 @@ So all components are started and stopped safely.</p>
 <h3><a href="#inject-components" id="inject-components">Inject components</a></h3>
 <p>Components are injected to a field of another component and middlewares.</p>
 <p>For injecting to a field, put the <code>Inject</code> annotation on it.</p>
-<pre><code class="language-language-java">@Inject
+<pre><code class="language-java">@Inject
 private TemplateEngine templateEngine;
 </code></pre>
 <p>If a class has multiple fields of same type, you can put the <code>Named</code> annotation for distinct.</p>
-<pre><code class="language-language-java">@Named(&quot;freemarker&quot;)
+<pre><code class="language-java">@Named(&quot;freemarker&quot;)
 @Inject
 private TemplateEngine freemarker;
 
@@ -186,14 +200,14 @@ private TemplateEngine thymeleaf;
 </code></pre>
 <h2><a href="#bootstrap-the-enkan-system" id="bootstrap-the-enkan-system">Bootstrap the Enkan system</a></h2>
 <p>To start/stop the Enkan system, call the <code>start()</code> or <code>stop()</code> method.</p>
-<pre><code class="language-language-java">system.start();
+<pre><code class="language-java">system.start();
 
 // ...
 
 system.stop();
 </code></pre>
 <p>It is better to bootstrap a system in the REPL for the operation.</p>
-<pre><code class="language-language-java">PseudoRepl repl = new PseudoRepl(MyExampleSystemFactory.class.getName());
+<pre><code class="language-java">PseudoRepl repl = new PseudoRepl(MyExampleSystemFactory.class.getName());
 ReplBoot.start(repl,
         new KotowariCommandRegister(),
         new DevelCommandRegister(),
@@ -202,7 +216,6 @@ ReplBoot.start(repl,
 <p><code>PseudoRepl</code> is a REPL server. The factory class for Enkan system.<br />
 <code>ReplBoot</code> is a tool for starting the REPL server and registering some commands to the REPL at same time.</p>
 
-          </div>
         </div>
       </div>
     </section>
@@ -210,20 +223,18 @@ ReplBoot.start(repl,
   </div>
     <footer>
       <div class="container">
-        <div class="col-lg-4">
-
-        </div>
-        <div class="col-lg-4 col-lg-offset-4">
-          © 2016 kawasima<br/>
-          Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+        <div class="row">
+          <div class="col-lg-4 offset-lg-8 text-end">
+            © 2016–2026 kawasima<br/>
+            Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+          </div>
         </div>
       </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
   </body>
 </html>

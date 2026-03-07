@@ -6,32 +6,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
-
-    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
-    <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
-        <div class="navbar-header page-scroll">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="../index.html">enkan</a>
-        </div>
+        <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+          <img src="../img/logo.png" alt="enkan logo" class="navbar-logo">enkan
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bs-navbar-collapse-1" aria-controls="bs-navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-            <li class="hidden active"><a href="#page-top"></a></li>
-            <li class="page-scroll">
-              <a href="getting-started.html">Docs</a>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../getting-started.html">Docs</a>
             </li>
-            <li>
-              <a href="https://github.com/enkan/enkan">GitHub</a>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -39,7 +34,7 @@
     </nav>
   <div class="container">
   <div class="row">
-    <section class="col-lg-3">
+    <aside class="col-lg-2">
 <nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
   <h3>Quick Start</h3>
   <ul class="sidebar-nav">
@@ -55,6 +50,11 @@
     <li class="sidebar-brand">
       <a href="../guide/why-enkan.html">
         Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/repl.html">
+        REPL-Driven Development
       </a>
     </li>
     <li class="sidebar-brand">
@@ -102,6 +102,21 @@
         Development tools
       </a>
     </li>
+    <li class="sidebar-brand">
+      <a href="../guide/testing.html">
+        Testing
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/deployment.html">
+        Deployment
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/spring-boot-comparison.html">
+        Spring Boot Comparison
+      </a>
+    </li>
   </ul>
 
   <h3>Reference</h3>
@@ -117,12 +132,11 @@
     </li>
   </ul>
 </nav>
-    </section>
-    <section class="col-lg-9">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12">
-          <h1><a href="#middleware-catalog" id="middleware-catalog">Middleware catalog</a></h1>
+    </aside>
+    <section class="col-lg-10">
+      <div class="row">
+        <div class="col-12">
+        <h1><a href="#middleware-catalog" id="middleware-catalog">Middleware catalog</a></h1>
 <h2><a href="#core" id="core">Core</a></h2>
 <p>enkan-core package has middlewares as follows:</p>
 <h3><a href="#authentication" id="authentication">Authentication</a></h3>
@@ -137,11 +151,11 @@
 </tbody>
 </table>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new AuthenticationMiddleware(backends));
+<pre><code class="language-java">app.use(new AuthenticationMiddleware(backends));
 </code></pre>
 <h3><a href="#serviceunavailable" id="serviceunavailable">ServiceUnavailable</a></h3>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new ServiceUnavailableMiddleware(serviceUnavailableEndpoint));
+<pre><code class="language-java">app.use(new ServiceUnavailableMiddleware(serviceUnavailableEndpoint));
 </code></pre>
 <h4><a href="#properties" id="properties">Properties</a></h4>
 <table>
@@ -161,7 +175,7 @@
 Location: http://myhost/abc/123
 </code></pre>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new AbsoluteRedirectsMiddleware());
+<pre><code class="language-java">app.use(new AbsoluteRedirectsMiddleware());
 </code></pre>
 <h4><a href="#properties" id="properties">Properties</a></h4>
 <p>AbsoluteRedirectsMiddleware has no properties.</p>
@@ -171,74 +185,74 @@ When the request method isn&rsquo;t GET/HEAD/OPTIONS, AntiForgeryMiddleware vali
 If the token is invalid, it returns the forbidden response.</p>
 <p>Because <code>AntiForgeryMiddleware</code> requires Session, We recommend using <code>Conversation</code> instead of this.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new AntiForgeryMiddleware());
+<pre><code class="language-java">app.use(new AntiForgeryMiddleware());
 </code></pre>
 <h4><a href="#properties" id="properties">Properties</a></h4>
 <p>AntiForgeryMiddleware has no properties.</p>
 <h3><a href="#contentnegotiation" id="contentnegotiation">ContentNegotiation</a></h3>
 <p>Parses the <code>Accept</code> header and sets the value to a request.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new ContentNegotiationMiddleware());
+<pre><code class="language-java">app.use(new ContentNegotiationMiddleware());
 </code></pre>
 <h3><a href="#contenttype" id="contenttype">ContentType</a></h3>
 <p>Adds the <code>Content-Type</code> header if the response does not contains a <code>Content-Type</code> header yet.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new ContentTypeMiddleware());
+<pre><code class="language-java">app.use(new ContentTypeMiddleware());
 </code></pre>
 <h3><a href="#conversation" id="conversation">Conversation</a></h3>
 <p>Creates a conversation and save states related with its conversation to the conversation store.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new ConversationMiddleware());
+<pre><code class="language-java">app.use(new ConversationMiddleware());
 </code></pre>
 <h3><a href="#cookies" id="cookies">Cookies</a></h3>
 <p>Parses <code>Cookie</code> header and sets the <code>Set-Cookie</code> header to the response.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new CookiesMiddleware());
+<pre><code class="language-java">app.use(new CookiesMiddleware());
 </code></pre>
 <h3><a href="#defaultcharset" id="defaultcharset">DefaultCharset</a></h3>
 <p>Adds the default charset to the response.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new DefaultCharsetMiddleware());
+<pre><code class="language-java">app.use(new DefaultCharsetMiddleware());
 </code></pre>
 <h3><a href="#flash" id="flash">Flash</a></h3>
 <p>Serializes and deserializes a flash value.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new FlashMiddleware());
+<pre><code class="language-java">app.use(new FlashMiddleware());
 </code></pre>
 <h3><a href="#idlesessiontimeout" id="idlesessiontimeout">IdleSessionTimeout</a></h3>
 <p>Enkan Session has no expires in default. This middleware append the feature of timeout to the session.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new IdleSessionTimeoutMiddleware());
+<pre><code class="language-java">app.use(new IdleSessionTimeoutMiddleware());
 </code></pre>
 <h3><a href="#methodoverride" id="methodoverride">MethodOverride</a></h3>
 <p>Override a request method.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new MethodOverrideMiddleware());
+<pre><code class="language-java">app.use(new MethodOverrideMiddleware());
 </code></pre>
 <h3><a href="#multipartparams" id="multipartparams">MultipartParams</a></h3>
 <p>Parses the multipart request.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new MultipartParamsMiddleware());
+<pre><code class="language-java">app.use(new MultipartParamsMiddleware());
 </code></pre>
 <h3><a href="#nestedparams" id="nestedparams">NestedParams</a></h3>
 <p>NestedParamsMiddleware enables to parse nested parameters like <code>foo[][bar]</code>. It requires ParamMiddleware.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new NestedParamsMiddleware());
+<pre><code class="language-java">app.use(new NestedParamsMiddleware());
 </code></pre>
 <h3><a href="#normalization" id="normalization">Normalization</a></h3>
 <p>Normalize the parameter values. It&rsquo;s for trimming spaces or converting letter case.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new NormalizationMiddleware());
+<pre><code class="language-java">app.use(new NormalizationMiddleware());
 </code></pre>
 <h3><a href="#params" id="params">Params</a></h3>
 <p>ParamMiddleware enables to parse urlencoded query string and post body and set to a request object.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new ParamsMiddleware());
+<pre><code class="language-java">app.use(new ParamsMiddleware());
 </code></pre>
 <h3><a href="#resources" id="resources">Resources</a></h3>
 <p>Returns the asset file that is searched from classpath.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new ResourceMiddleware());
+<pre><code class="language-java">app.use(new ResourceMiddleware());
 </code></pre>
 <h4><a href="#properties" id="properties">Properties</a></h4>
 <table>
@@ -252,7 +266,7 @@ If the token is invalid, it returns the forbidden response.</p>
 <h3><a href="#session" id="session">Session</a></h3>
 <p>SessionMiddleware enables to store/load session objects to/from in-memory stores.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new SessionMiddleware());
+<pre><code class="language-java">app.use(new SessionMiddleware());
 </code></pre>
 <h4><a href="#properties" id="properties">Properties</a></h4>
 <table>
@@ -267,7 +281,7 @@ If the token is invalid, it returns the forbidden response.</p>
 <h3><a href="#trace" id="trace">Trace</a></h3>
 <p>Adds the response header for tracing using middlewares.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new TraceMiddleware());
+<pre><code class="language-java">app.use(new TraceMiddleware());
 </code></pre>
 <h3><a href="#securityheaders" id="securityheaders">SecurityHeaders</a></h3>
 <p>Applies a suite of security-related HTTP response headers in a single middleware (similar to <a href="https://helmetjs.github.io/">Helmet.js</a> for Express).</p>
@@ -289,7 +303,7 @@ If the token is invalid, it returns the forbidden response.</p>
 </tbody>
 </table>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">// All defaults
+<pre><code class="language-java">// All defaults
 app.use(new SecurityHeadersMiddleware());
 
 // Custom CSP, disable HSTS for local development
@@ -318,26 +332,26 @@ app.use(sec);
 <h3><a href="#controllerinvoker" id="controllerinvoker">ControllerInvoker</a></h3>
 <p>Invoke a controller method.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new ControllerInvokerMiddleware());
+<pre><code class="language-java">app.use(new ControllerInvokerMiddleware());
 </code></pre>
 <h3><a href="#form" id="form">Form</a></h3>
 <p>Populate the request body to a Java bean object.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new FormMiddleware());
+<pre><code class="language-java">app.use(new FormMiddleware());
 </code></pre>
 <h4><a href="#properties" id="properties">Properties</a></h4>
 <p><code>FormMiddleware</code> has no properties.</p>
 <h3><a href="#rendertemplate" id="rendertemplate">RenderTemplate</a></h3>
 <p>Render HTML using a template. When a controller returns <code>TemplatedHttpResponse</code>, it has yet to be rendered.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new RenderTemplateMiddleware());
+<pre><code class="language-java">app.use(new RenderTemplateMiddleware());
 </code></pre>
 <h4><a href="#properties" id="properties">Properties</a></h4>
 <p><code>RenderTemplateMiddleware</code> has no properties.</p>
 <h3><a href="#routing" id="routing">Routing</a></h3>
 <p>Routes the request to a controller method.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new RoutingMiddleware(routes));
+<pre><code class="language-java">app.use(new RoutingMiddleware(routes));
 </code></pre>
 <h4><a href="#properties" id="properties">Properties</a></h4>
 <table>
@@ -351,7 +365,7 @@ app.use(sec);
 <h3><a href="#serdes" id="serdes">SerDes</a></h3>
 <p>Deserialize the request body and serializes the response body.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new SerDesMiddleware());
+<pre><code class="language-java">app.use(new SerDesMiddleware());
 </code></pre>
 <h4><a href="#properties" id="properties">Properties</a></h4>
 <table>
@@ -366,13 +380,13 @@ app.use(sec);
 <h3><a href="#transaction" id="transaction">Transaction</a></h3>
 <p>Manages database transactions around controller invocation.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">// requires enkan-component-doma2 dependency
+<pre><code class="language-java">// requires enkan-component-doma2 dependency
 app.use(new DomaTransactionMiddleware&lt;&gt;(config));
 </code></pre>
 <h3><a href="#validatebody" id="validatebody">ValidateBody</a></h3>
 <p>Validates the body object. If body object implements the <code>Validatable</code> interface, the error messages are set to it.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new ValidateBodyMiddleware());
+<pre><code class="language-java">app.use(new ValidateBodyMiddleware());
 </code></pre>
 <h4><a href="#properties" id="properties">Properties</a></h4>
 <p><code>ValidateBodyMiddleware</code> has no properties.</p>
@@ -380,15 +394,65 @@ app.use(new DomaTransactionMiddleware&lt;&gt;(config));
 <h3><a href="#cors" id="cors">Cors</a></h3>
 <p><code>CorsMiddleware</code> handles Cross-Origin Resource Sharing (CORS) headers.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new CorsMiddleware());
+<pre><code class="language-java">app.use(new CorsMiddleware());
 </code></pre>
 <h3><a href="#forwardedscheme" id="forwardedscheme">ForwardedScheme</a></h3>
 <p><code>ForwardedSchemeMiddleware</code> detects the original request scheme from <code>X-Forwarded-Proto</code> header and sets it on the request.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-language-java">app.use(new ForwardedSchemeMiddleware());
+<pre><code class="language-java">app.use(new ForwardedSchemeMiddleware());
+</code></pre>
+<h3><a href="#cachecontrol" id="cachecontrol">CacheControl</a></h3>
+<p>Sets <code>Cache-Control</code> response headers based on configurable rules.<br />
+A <code>staticPattern</code> regex distinguishes static assets from dynamic responses.<br />
+URIs matching the pattern receive the <code>staticDirective</code>; all others receive the <code>dynamicDirective</code>.<br />
+If a downstream handler already set <code>Cache-Control</code>, this middleware leaves it unchanged.</p>
+<h4><a href="#usage" id="usage">Usage</a></h4>
+<pre><code class="language-java">CacheControlMiddleware cache = new CacheControlMiddleware();
+cache.setStaticPattern(Pattern.compile(&quot;^/assets/&quot;));
+cache.setStaticMaxAge(Duration.ofDays(365));
+cache.setDynamicDirective(&quot;no-cache&quot;);
+app.use(cache);
+</code></pre>
+<h4><a href="#properties" id="properties">Properties</a></h4>
+<table>
+<thead>
+<tr><th align="left"> Name </th><th align="left"> Type </th><th align="left"> Description </th><th align="left"> Default </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> <code>staticPattern</code> </td><td align="left"> <code>Pattern</code> </td><td align="left"> Regex to identify static asset URIs </td><td align="left"> <code>null</code> (disabled) </td></tr>
+<tr><td align="left"> <code>staticMaxAge</code> </td><td align="left"> <code>Duration</code> </td><td align="left"> Convenience setter: produces <code>public, max-age=N, immutable</code> </td><td align="left"> — </td></tr>
+<tr><td align="left"> <code>staticDirective</code> </td><td align="left"> <code>String</code> </td><td align="left"> Full directive for static assets </td><td align="left"> <code>&quot;public, max-age=31536000, immutable&quot;</code> </td></tr>
+<tr><td align="left"> <code>dynamicDirective</code> </td><td align="left"> <code>String</code> </td><td align="left"> Directive for non-static responses; <code>null</code> to omit </td><td align="left"> <code>&quot;no-cache&quot;</code> </td></tr>
+</tbody>
+</table>
+<h2><a href="#jooq" id="jooq">jOOQ</a></h2>
+<h3><a href="#jooqdslcontext" id="jooqdslcontext">JooqDslContext</a></h3>
+<p>Stores a non-transactional <code>DSLContext</code> in the request extensions under the key <code>jooqDslContext</code>.<br />
+Stack <code>JooqTransactionMiddleware</code> after this when transactional support is needed.<br />
+Requires <code>JooqProvider</code> component.</p>
+<h4><a href="#usage" id="usage">Usage</a></h4>
+<pre><code class="language-java">// requires enkan-component-jooq dependency
+app.use(new JooqDslContextMiddleware());
+</code></pre>
+<h3><a href="#jooqtransaction" id="jooqtransaction">JooqTransaction</a></h3>
+<p>Wraps the downstream handler in a jOOQ transaction when the matched controller class or method is annotated with <code>@Transactional</code>.<br />
+Method-level annotation overrides class-level. Only <code>REQUIRED</code> propagation is supported.<br />
+Requires <code>JooqDslContextMiddleware</code> to be stacked before this middleware.</p>
+<h4><a href="#usage" id="usage">Usage</a></h4>
+<pre><code class="language-java">app.use(new JooqDslContextMiddleware());
+app.use(new JooqTransactionMiddleware());
+</code></pre>
+<h2><a href="#opentelemetry" id="opentelemetry">OpenTelemetry</a></h2>
+<h3><a href="#tracing" id="tracing">Tracing</a></h3>
+<p>Creates an OpenTelemetry <code>SERVER</code> span for each HTTP request.<br />
+Extracts W3C Trace Context (<code>traceparent</code>/<code>tracestate</code>) from incoming headers.<br />
+Records HTTP semantic convention attributes: method, URL path, query string, status code, server address/port, client address, and network protocol version.<br />
+Requires <code>OpenTelemetryComponent</code>.</p>
+<h4><a href="#usage" id="usage">Usage</a></h4>
+<pre><code class="language-java">// requires enkan-component-opentelemetry dependency
+app.use(new TracingMiddleware());
 </code></pre>
 
-          </div>
         </div>
       </div>
     </section>
@@ -396,20 +460,18 @@ app.use(new DomaTransactionMiddleware&lt;&gt;(config));
   </div>
     <footer>
       <div class="container">
-        <div class="col-lg-4">
-
-        </div>
-        <div class="col-lg-4 col-lg-offset-4">
-          © 2016 kawasima<br/>
-          Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+        <div class="row">
+          <div class="col-lg-4 offset-lg-8 text-end">
+            © 2016–2026 kawasima<br/>
+            Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+          </div>
         </div>
       </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
   </body>
 </html>

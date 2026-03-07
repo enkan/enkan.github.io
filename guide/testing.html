@@ -6,32 +6,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/prism/1.5.0/themes/prism.css" type="text/css"/>
-
-    <link href="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
   </head>
   <body id="page-top">
-    <nav class="navbar navbar-default navbar-fixed-top navbar-shrink">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
-        <div class="navbar-header page-scroll">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="../index.html">enkan</a>
-        </div>
+        <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+          <img src="../img/logo.png" alt="enkan logo" class="navbar-logo">enkan
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bs-navbar-collapse-1" aria-controls="bs-navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-            <li class="hidden active"><a href="#page-top"></a></li>
-            <li class="page-scroll">
-              <a href="getting-started.html">Docs</a>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../getting-started.html">Docs</a>
             </li>
-            <li>
-              <a href="https://github.com/enkan/enkan">GitHub</a>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/enkan/enkan">GitHub</a>
             </li>
           </ul>
         </div>
@@ -39,7 +34,7 @@
     </nav>
   <div class="container">
   <div class="row">
-    <section class="col-lg-3">
+    <aside class="col-lg-2">
 <nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
   <h3>Quick Start</h3>
   <ul class="sidebar-nav">
@@ -55,6 +50,11 @@
     <li class="sidebar-brand">
       <a href="../guide/why-enkan.html">
         Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/repl.html">
+        REPL-Driven Development
       </a>
     </li>
     <li class="sidebar-brand">
@@ -102,6 +102,21 @@
         Development tools
       </a>
     </li>
+    <li class="sidebar-brand">
+      <a href="../guide/testing.html">
+        Testing
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/deployment.html">
+        Deployment
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/spring-boot-comparison.html">
+        Spring Boot Comparison
+      </a>
+    </li>
   </ul>
 
   <h3>Reference</h3>
@@ -117,18 +132,17 @@
     </li>
   </ul>
 </nav>
-    </section>
-    <section class="col-lg-9">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12">
-          <h1><a href="#testing" id="testing">Testing</a></h1>
+    </aside>
+    <section class="col-lg-10">
+      <div class="row">
+        <div class="col-12">
+        <h1><a href="#testing" id="testing">Testing</a></h1>
 <p>Enkan&rsquo;s design makes testing straightforward: middleware and components are plain Java objects with no hidden wiring.<br />
 You do not need a running HTTP server or a full application context to test most code.</p>
 <hr />
 <h2><a href="#testing-middleware-in-isolation" id="testing-middleware-in-isolation">Testing Middleware in Isolation</a></h2>
 <p>The standard pattern is to construct a <code>DefaultMiddlewareChain</code> with a stub endpoint, then call <code>handle()</code> directly.</p>
-<pre><code class="language-language-java">import enkan.Endpoint;
+<pre><code class="language-java">import enkan.Endpoint;
 import enkan.MiddlewareChain;
 import enkan.chain.DefaultMiddlewareChain;
 import enkan.data.DefaultHttpRequest;
@@ -165,7 +179,7 @@ class MyMiddlewareTest {
 </ul>
 <h3><a href="#building-request-objects" id="building-request-objects">Building request objects</a></h3>
 <p>Use <code>BeanBuilder</code> for concise request/response construction:</p>
-<pre><code class="language-language-java">import static enkan.util.BeanBuilder.builder;
+<pre><code class="language-java">import static enkan.util.BeanBuilder.builder;
 
 HttpRequest request = builder(new DefaultHttpRequest())
     .set(HttpRequest::setRequestMethod, &quot;POST&quot;)
@@ -176,7 +190,7 @@ HttpRequest request = builder(new DefaultHttpRequest())
 <h3><a href="#testing-middleware-that-uses-the-mixin-pattern" id="testing-middleware-that-uses-the-mixin-pattern">Testing middleware that uses the Mixin pattern</a></h3>
 <p>Some middleware adds capabilities to the request via <code>MixinUtils.mixin()</code>.<br />
 After calling <code>handle()</code>, cast the request inside the endpoint lambda to the mixin interface:</p>
-<pre><code class="language-language-java">@Test
+<pre><code class="language-java">@Test
 void setsLocaleOnRequest() {
     ContentNegotiationMiddleware cnm = new ContentNegotiationMiddleware();
     cnm.setAllowedLanguages(Set.of(&quot;en&quot;, &quot;ja&quot;));
@@ -200,7 +214,7 @@ void setsLocaleOnRequest() {
 <h2><a href="#testing-controllers" id="testing-controllers">Testing Controllers</a></h2>
 <p>Controllers are plain Java classes. Instantiate them directly, inject component mocks via setters,<br />
 and call the method under test.</p>
-<pre><code class="language-language-java">class CustomerControllerTest {
+<pre><code class="language-java">class CustomerControllerTest {
 
     @Test
     void indexReturnsTemplatedResponse() {
@@ -220,14 +234,14 @@ and call the method under test.</p>
 </code></pre>
 <p>Because components are injected via <code>@Inject</code>-annotated fields (not constructor arguments),<br />
 you can set them in tests using a simple setter or direct field access:</p>
-<pre><code class="language-language-java">// Direct field access for tests (when no setter exists)
+<pre><code class="language-java">// Direct field access for tests (when no setter exists)
 ReflectionTestUtils.setField(controller, &quot;templateEngine&quot;, fakeEngine);
 </code></pre>
 <hr />
 <h2><a href="#testing-components" id="testing-components">Testing Components</a></h2>
 <p>Components are lifecycle objects. Test them by calling <code>start()</code> and <code>stop()</code> explicitly,<br />
 or just test the component&rsquo;s methods without the full lifecycle if the method does not require it.</p>
-<pre><code class="language-language-java">class HikariCPComponentTest {
+<pre><code class="language-java">class HikariCPComponentTest {
 
     @Test
     void providesWorkingDataSource() throws Exception {
@@ -250,7 +264,7 @@ or just test the component&rsquo;s methods without the full lifecycle if the met
 <h2><a href="#integration-testing" id="integration-testing">Integration Testing</a></h2>
 <p>For integration tests that exercise the full middleware stack, build a minimal <code>Application</code><br />
 and drive it with constructed requests — no HTTP server needed.</p>
-<pre><code class="language-language-java">class AppIntegrationTest {
+<pre><code class="language-java">class AppIntegrationTest {
 
     private Application&lt;HttpRequest, HttpResponse&gt; app;
 
@@ -280,7 +294,6 @@ and drive it with constructed requests — no HTTP server needed.</p>
 <li><strong>Test one middleware at a time</strong> — each middleware is a small, focused unit; integration tests should be reserved for verifying the composed stack.</li>
 </ul>
 
-          </div>
         </div>
       </div>
     </section>
@@ -288,20 +301,18 @@ and drive it with constructed requests — no HTTP server needed.</p>
   </div>
     <footer>
       <div class="container">
-        <div class="col-lg-4">
-
-        </div>
-        <div class="col-lg-4 col-lg-offset-4">
-          © 2016 kawasima<br/>
-          Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+        <div class="row">
+          <div class="col-lg-4 offset-lg-8 text-end">
+            © 2016–2026 kawasima<br/>
+            Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+          </div>
         </div>
       </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/jquery/1.12.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/prism.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/components/prism-bash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/prism/1.5.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
   </body>
 </html>
