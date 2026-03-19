@@ -164,7 +164,8 @@
 <li>ApplicationComponent</li>
 </ul>
 <h2><a href="#jetty" id="jetty">Jetty</a></h2>
-<p>Jetty component provides the feature of a web server based on Eclipse Jetty.</p>
+<p>Jetty component provides the feature of a web server based on Eclipse Jetty.<br />
+Uses virtual threads by default for high-throughput request handling.</p>
 <h3><a href="#usage" id="usage">Usage</a></h3>
 <pre><code class="language-xml">&lt;dependency&gt;
   &lt;groupId&gt;net.unit8.enkan&lt;/groupId&gt;
@@ -183,6 +184,7 @@
 <tr><td align="left">sslPort</td><td align="left">int</td><td align="left">SSL listen port</td><td align="left">443</td></tr>
 <tr><td align="left">keystorePath</td><td align="left">String</td><td align="left">Path to keystore file</td><td align="left">-</td></tr>
 <tr><td align="left">keystorePassword</td><td align="left">String</td><td align="left">Password for keystore</td><td align="left">-</td></tr>
+<tr><td align="left">virtualThreads</td><td align="left">boolean</td><td align="left">Use virtual threads for request handling</td><td align="left">true</td></tr>
 </tbody>
 </table>
 <h3><a href="#dependencies" id="dependencies">Dependencies</a></h3>
@@ -371,7 +373,44 @@
   &lt;artifactId&gt;enkan-component-jackson&lt;/artifactId&gt;
 &lt;/dependency&gt;
 </code></pre>
-<h2><a href="#metrics" id="metrics">Metrics</a></h2>
+<h2><a href="#micrometer" id="micrometer">Micrometer</a></h2>
+<p>Micrometer component provides application metrics via the <a href="https://micrometer.io/">Micrometer</a> facade.<br />
+Supports Prometheus, Datadog, CloudWatch, and other backends via pluggable <code>MeterRegistry</code>.</p>
+<h3><a href="#usage" id="usage">Usage</a></h3>
+<pre><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;net.unit8.enkan&lt;/groupId&gt;
+  &lt;artifactId&gt;enkan-component-micrometer&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+<pre><code class="language-java">// Default (SimpleMeterRegistry — suitable for development and REPL inspection)
+MicrometerComponent micrometer = new MicrometerComponent();
+
+// With Prometheus registry for production
+MicrometerComponent micrometer = new MicrometerComponent(new PrometheusMeterRegistry(...));
+</code></pre>
+<h3><a href="#properties" id="properties">Properties</a></h3>
+<table>
+<thead>
+<tr><th align="left"> Name </th><th align="left"> Type </th><th align="left"> Description </th><th align="left"> Default </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> metricPrefix </td><td align="left"> String </td><td align="left"> Prefix for all meter names </td><td align="left"> <code>enkan</code> </td></tr>
+</tbody>
+</table>
+<h3><a href="#tracked-metrics" id="tracked-metrics">Tracked Metrics</a></h3>
+<ul>
+<li><code>{prefix}.http.server.requests</code> — request duration (Timer)</li>
+<li><code>{prefix}.http.server.errors</code> — error count (Counter)</li>
+<li><code>{prefix}.http.server.active.requests</code> — in-flight request count (Gauge)</li>
+</ul>
+<h3><a href="#dependencies" id="dependencies">Dependencies</a></h3>
+<ul>
+<li>None (standalone component; inject into <code>MicrometerMiddleware</code> via the system)</li>
+</ul>
+<h2><a href="#metrics-deprecated" id="metrics-deprecated">Metrics (Deprecated)</a></h2>
+<blockquote>
+<p><strong>Deprecated:</strong> Use <code>enkan-component-micrometer</code> instead. This module will be removed in a future major release.</p>
+</blockquote>
 <p>Metrics component provides the feature of collecting application metrics using Dropwizard Metrics.</p>
 <h3><a href="#usage" id="usage">Usage</a></h3>
 <pre><code class="language-xml">&lt;dependency&gt;

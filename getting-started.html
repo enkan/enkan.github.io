@@ -143,24 +143,28 @@
 <li>Maven 3.6.3 or higher</li>
 </ul>
 <h2><a href="#add-the-dependency" id="add-the-dependency">Add the dependency</a></h2>
-<p>Add <code>enkan-web</code> and a server component to your <code>pom.xml</code>:</p>
+<p>Add <code>kotowari</code> (MVC framework) and a server component to your <code>pom.xml</code>:</p>
 <pre><code class="language-xml">&lt;dependency&gt;
   &lt;groupId&gt;net.unit8.enkan&lt;/groupId&gt;
-  &lt;artifactId&gt;enkan-web&lt;/artifactId&gt;
-  &lt;version&gt;0.13.0&lt;/version&gt;
+  &lt;artifactId&gt;kotowari&lt;/artifactId&gt;
+  &lt;version&gt;0.14.0&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
   &lt;groupId&gt;net.unit8.enkan&lt;/groupId&gt;
   &lt;artifactId&gt;enkan-component-jetty&lt;/artifactId&gt;
-  &lt;version&gt;0.13.0&lt;/version&gt;
+  &lt;version&gt;0.14.0&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
+<p>If you only need the middleware core without MVC routing, use <code>enkan-web</code> instead of <code>kotowari</code>.</p>
 <h2><a href="#hello-world" id="hello-world">Hello World</a></h2>
-<p>Define your application factory with a middleware stack and a route:</p>
+<h3><a href="#1-define-your-application-factory" id="1-define-your-application-factory">1. Define your application factory</a></h3>
+<p>An application factory builds the middleware stack and routing table:</p>
 <pre><code class="language-java">import enkan.Application;
 import enkan.application.WebApplication;
-import enkan.middleware.DefaultCharsetMiddleware;
-import kotowari.middleware.ControllerInvokerMiddleware;
+import enkan.config.ApplicationFactory;
+import enkan.middleware.*;
+import enkan.system.EnkanSystem;
+import kotowari.middleware.*;
 import kotowari.routing.Routes;
 
 public class MyAppFactory implements ApplicationFactory {
@@ -173,21 +177,30 @@ public class MyAppFactory implements ApplicationFactory {
         }).compile();
 
         app.use(new DefaultCharsetMiddleware());
+        app.use(new ContentTypeMiddleware());
+        app.use(new ParamsMiddleware());
         app.use(new RoutingMiddleware(routes));
         app.use(new ControllerInvokerMiddleware(system));
         return app;
     }
 }
 </code></pre>
-<p>Your controller is a plain Java class — no annotations, no base class:</p>
-<pre><code class="language-java">public class HomeController {
+<h3><a href="#2-write-a-controller" id="2-write-a-controller">2. Write a controller</a></h3>
+<p>Controllers are plain Java classes — no annotations, no base class:</p>
+<pre><code class="language-java">import enkan.data.HttpResponse;
+
+public class HomeController {
     public HttpResponse index() {
         return HttpResponse.of(&quot;Hello, World!&quot;);
     }
 }
 </code></pre>
-<p>Wire everything together in a system factory:</p>
-<pre><code class="language-java">import static enkan.system.EnkanSystem.component;
+<h3><a href="#3-wire-the-system" id="3-wire-the-system">3. Wire the system</a></h3>
+<pre><code class="language-java">import enkan.system.EnkanSystem;
+import enkan.component.ApplicationComponent;
+import enkan.component.jetty.JettyComponent;
+
+import static enkan.system.EnkanSystem.component;
 
 public class MySystemFactory {
     public EnkanSystem create() {
@@ -200,13 +213,21 @@ public class MySystemFactory {
     }
 }
 </code></pre>
-<h2><a href="#start-repl" id="start-repl">Start REPL</a></h2>
+<h2><a href="#start-the-repl" id="start-the-repl">Start the REPL</a></h2>
 <pre><code class="language-bash">% mvn -e compile exec:java
 </code></pre>
-<p>If you execute the <code>/start</code> command, application will start.</p>
+<p>Start the system with the <code>/start</code> command:</p>
 <pre><code class="language-bash">enkan&gt; /start
 </code></pre>
-<p>Try to access <a href="http://localhost:3000/"><code>http://localhost:3000/</code></a> in your browser.</p>
+<p>Access <a href="http://localhost:3000/">http://localhost:3000/</a> in your browser.</p>
+<h2><a href="#whats-next" id="whats-next">What&rsquo;s next?</a></h2>
+<ul>
+<li><a href="guide/why-enkan.html">Why Enkan?</a> — design philosophy and comparison with other frameworks</li>
+<li><a href="guide/enkan-system.html">EnkanSystem</a> — component lifecycle and dependency wiring</li>
+<li><a href="guide/controller.html">Controllers</a> — parameter injection, form handling, templates</li>
+<li><a href="reference/components.html">Component Catalog</a> — all available components and their configuration</li>
+<li><a href="reference/middlewares.html">Middleware Reference</a> — all available middleware</li>
+</ul>
 
         </div>
       </div>
