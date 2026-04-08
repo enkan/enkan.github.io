@@ -209,11 +209,72 @@ If the token is invalid, it returns the forbidden response.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new CookiesMiddleware());
 </code></pre>
+<h3><a href="#cspnonce" id="cspnonce">CspNonce</a></h3>
+<p>Generates a cryptographically random per-request CSP nonce (128-bit, Base64url-encoded) and<br />
+injects it into the <code>Content-Security-Policy</code> <code>script-src</code> directive.</p>
+<p>Place <strong>before</strong> <code>SecurityHeadersMiddleware</code> so the nonce is injected into the CSP header that<br />
+<code>SecurityHeadersMiddleware</code> adds.</p>
+<p>The nonce is available to controllers and templates via:</p>
+<pre><code class="language-java">String nonce = request.getExtension(CspNonceMiddleware.EXTENSION_KEY); // &quot;cspNonce&quot;
+</code></pre>
+<h4><a href="#usage" id="usage">Usage</a></h4>
+<pre><code class="language-java">CspNonceMiddleware nonce = new CspNonceMiddleware();
+nonce.setStrictDynamic(true); // adds 'strict-dynamic' to script-src
+app.use(nonce);
+app.use(new SecurityHeadersMiddleware()); // downstream
+</code></pre>
+<pre><code class="language-html">&lt;!-- Thymeleaf / Freemarker template --&gt;
+&lt;script th:nonce=&quot;${#request.getExtension('cspNonce')}&quot;&gt;
+  // inline script
+&lt;/script&gt;
+</code></pre>
+<h4><a href="#properties" id="properties">Properties</a></h4>
+<table>
+<thead>
+<tr><th align="left"> Name </th><th align="left"> Type </th><th align="left"> Default </th><th align="left"> Description </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> <code>strictDynamic</code> </td><td align="left"> <code>boolean</code> </td><td align="left"> <code>false</code> </td><td align="left"> Adds <code>'strict-dynamic'</code> to the <code>script-src</code> directive </td></tr>
+</tbody>
+</table>
 <h3><a href="#defaultcharset" id="defaultcharset">DefaultCharset</a></h3>
 <p>Adds the default charset to the response.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new DefaultCharsetMiddleware());
 </code></pre>
+<h3><a href="#digestvalidation" id="digestvalidation">DigestValidation</a></h3>
+<p>Validates <code>Content-Digest</code> and <code>Repr-Digest</code> request headers per<br />
+<a href="https://www.rfc-editor.org/rfc/rfc9530">RFC 9530</a>. Supports <code>sha-256</code> and <code>sha-512</code>.<br />
+Returns 400 if the digest does not match; passes through if neither header is present.</p>
+<blockquote>
+<p><strong>Note:</strong> The entire request body is buffered for digest computation. Do not apply to<br />
+large streaming uploads unconditionally — use a predicate to scope it to relevant routes.</p>
+</blockquote>
+<h4><a href="#usage" id="usage">Usage</a></h4>
+<pre><code class="language-java">app.use(new DigestValidationMiddleware());
+</code></pre>
+<h3><a href="#fetchmetadata" id="fetchmetadata">FetchMetadata</a></h3>
+<p>Implements the W3C <a href="https://www.w3.org/TR/fetch-metadata/">Resource Isolation Policy</a> using<br />
+<code>Sec-Fetch-Site</code> and <code>Sec-Fetch-Mode</code> request headers. Blocks cross-origin, non-navigational<br />
+requests by default. Returns 403 for blocked requests.</p>
+<p>Browsers that do not send <code>Sec-Fetch-*</code> headers (non-browser clients, legacy browsers) are<br />
+always allowed through. Combine with CSRF tokens for full defense against those clients.</p>
+<p>When using <code>CorsMiddleware</code>, add the CORS-enabled paths to <code>allowedPaths</code> so preflight<br />
+(<code>OPTIONS</code>) requests are not blocked before reaching <code>CorsMiddleware</code>.</p>
+<h4><a href="#usage" id="usage">Usage</a></h4>
+<pre><code class="language-java">FetchMetadataMiddleware fm = new FetchMetadataMiddleware();
+fm.setAllowedPaths(Set.of(&quot;/api/public/feed&quot;, &quot;/health&quot;));
+app.use(fm);
+</code></pre>
+<h4><a href="#properties" id="properties">Properties</a></h4>
+<table>
+<thead>
+<tr><th align="left"> Name </th><th align="left"> Type </th><th align="left"> Default </th><th align="left"> Description </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> <code>allowedPaths</code> </td><td align="left"> <code>Set&lt;String&gt;</code> </td><td align="left"> empty </td><td align="left"> Exact URI paths allowed to receive cross-origin requests </td></tr>
+</tbody>
+</table>
 <h3><a href="#flash" id="flash">Flash</a></h3>
 <p>Serializes and deserializes a flash value.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
@@ -249,6 +310,32 @@ If the token is invalid, it returns the forbidden response.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new ParamsMiddleware());
 </code></pre>
+<h3><a href="#requesttimeout" id="requesttimeout">RequestTimeout</a></h3>
+<p>Enforces a per-request processing timeout using Java&rsquo;s <code>StructuredTaskScope</code> (preview API).<br />
+Runs the downstream middleware chain in a virtual thread; returns the configured HTTP status<br />
+(default 504 Gateway Timeout) if processing exceeds the timeout.</p>
+<blockquote>
+<p><strong>Preview API:</strong> requires <code>--enable-preview</code> at both compile and run time.</p>
+<p><strong>ThreadLocal warning:</strong> ThreadLocal state is not inherited by the virtual thread spawned<br />
+internally. Doma2&rsquo;s <code>DomaTransactionMiddleware</code> uses ThreadLocal and must be placed<br />
+<strong>downstream</strong> (inside) of <code>RequestTimeoutMiddleware</code>.</p>
+</blockquote>
+<h4><a href="#usage" id="usage">Usage</a></h4>
+<pre><code class="language-java">RequestTimeoutMiddleware timeout = new RequestTimeoutMiddleware();
+timeout.setTimeoutMillis(30_000); // 30 seconds
+timeout.setTimeoutStatus(504);
+app.use(timeout);
+</code></pre>
+<h4><a href="#properties" id="properties">Properties</a></h4>
+<table>
+<thead>
+<tr><th align="left"> Name </th><th align="left"> Type </th><th align="left"> Default </th><th align="left"> Description </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> <code>timeoutMillis</code> </td><td align="left"> <code>long</code> </td><td align="left"> <code>30000</code> </td><td align="left"> Timeout in milliseconds. Must be positive. </td></tr>
+<tr><td align="left"> <code>timeoutStatus</code> </td><td align="left"> <code>int</code> </td><td align="left"> <code>504</code> </td><td align="left"> HTTP status code returned on timeout (100–599). </td></tr>
+</tbody>
+</table>
 <h3><a href="#resources" id="resources">Resources</a></h3>
 <p>Returns the asset file that is searched from classpath.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
@@ -278,11 +365,6 @@ If the token is invalid, it returns the forbidden response.</p>
 <tr><td align="left">store</td><td align="left">A storage for session.</td></tr>
 </tbody>
 </table>
-<h3><a href="#trace" id="trace">Trace</a></h3>
-<p>Adds the response header for tracing using middlewares.</p>
-<h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-java">app.use(new TraceMiddleware());
-</code></pre>
 <h3><a href="#securityheaders" id="securityheaders">SecurityHeaders</a></h3>
 <p>Applies a suite of security-related HTTP response headers in a single middleware (similar to <a href="https://helmetjs.github.io/">Helmet.js</a> for Express).</p>
 <p>All headers are enabled by default with safe values. Pass <code>null</code> to any setter to disable a specific header.</p>
@@ -300,6 +382,8 @@ If the token is invalid, it returns the forbidden response.</p>
 <tr><td align="left"> <code>Referrer-Policy</code> </td><td align="left"> <code>strict-origin-when-cross-origin</code> </td></tr>
 <tr><td align="left"> <code>Cross-Origin-Opener-Policy</code> </td><td align="left"> <code>same-origin</code> </td></tr>
 <tr><td align="left"> <code>Cross-Origin-Resource-Policy</code> </td><td align="left"> <code>same-origin</code> </td></tr>
+<tr><td align="left"> <code>Cross-Origin-Embedder-Policy</code> </td><td align="left"> <code>require-corp</code> </td></tr>
+<tr><td align="left"> <code>Permissions-Policy</code> </td><td align="left"> <em>(disabled by default)</em> </td></tr>
 </tbody>
 </table>
 <h4><a href="#usage" id="usage">Usage</a></h4>
@@ -326,8 +410,39 @@ app.use(sec);
 <tr><td align="left"> <code>referrerPolicy</code> </td><td align="left"> <code>Referrer-Policy</code> value. </td></tr>
 <tr><td align="left"> <code>crossOriginOpenerPolicy</code> </td><td align="left"> <code>Cross-Origin-Opener-Policy</code> value. </td></tr>
 <tr><td align="left"> <code>crossOriginResourcePolicy</code> </td><td align="left"> <code>Cross-Origin-Resource-Policy</code> value. </td></tr>
+<tr><td align="left"> <code>crossOriginEmbedderPolicy</code> </td><td align="left"> <code>Cross-Origin-Embedder-Policy</code> value. </td></tr>
+<tr><td align="left"> <code>permissionsPolicy</code> </td><td align="left"> <code>Permissions-Policy</code> value. <code>null</code> (default) disables the header. </td></tr>
+<tr><td align="left"> <code>reportingEndpoints</code> </td><td align="left"> <code>Reporting-Endpoints</code> value. <code>null</code> (default) disables the header. </td></tr>
 </tbody>
 </table>
+<h3><a href="#signatureverification" id="signatureverification">SignatureVerification</a></h3>
+<p>Verifies <a href="https://www.rfc-editor.org/rfc/rfc9421">RFC 9421</a> HTTP Message Signatures on incoming<br />
+requests. Verified results are stored in the request extension under the key<br />
+<code>SignatureVerificationMiddleware.EXTENSION_KEY</code> (<code>&quot;signatureVerifyResults&quot;</code>).</p>
+<p>Returns 401 if required labels or components are missing/invalid; 400 on malformed headers.</p>
+<p>See <a href="../guide/security.html#http-message-signatures">Security guide</a> for full usage.</p>
+<h4><a href="#usage" id="usage">Usage</a></h4>
+<pre><code class="language-java">SignatureVerificationMiddleware verify =
+    new SignatureVerificationMiddleware(keyResolver);
+verify.setRequiredLabels(Set.of(&quot;sig1&quot;));
+verify.setRequiredComponents(Set.of(&quot;@method&quot;, &quot;@path&quot;, &quot;content-type&quot;));
+app.use(verify);
+</code></pre>
+<h4><a href="#properties" id="properties">Properties</a></h4>
+<table>
+<thead>
+<tr><th align="left"> Name </th><th align="left"> Type </th><th align="left"> Description </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> <code>requiredLabels</code> </td><td align="left"> <code>Set&lt;String&gt;</code> </td><td align="left"> Signature labels that must be present and valid </td></tr>
+<tr><td align="left"> <code>requiredComponents</code> </td><td align="left"> <code>Set&lt;String&gt;</code> </td><td align="left"> Component identifiers that must be covered by the signature </td></tr>
+</tbody>
+</table>
+<h3><a href="#trace" id="trace">Trace</a></h3>
+<p>Adds the response header for tracing using middlewares.</p>
+<h4><a href="#usage" id="usage">Usage</a></h4>
+<pre><code class="language-java">app.use(new TraceMiddleware());
+</code></pre>
 <h2><a href="#kotowari" id="kotowari">Kotowari</a></h2>
 <h3><a href="#controllerinvoker" id="controllerinvoker">ControllerInvoker</a></h3>
 <p>Invoke a controller method.</p>
@@ -396,11 +511,33 @@ app.use(new DomaTransactionMiddleware&lt;&gt;(config));
 <h4><a href="#usage" id="usage">Usage</a></h4>
 <pre><code class="language-java">app.use(new CorsMiddleware());
 </code></pre>
-<h3><a href="#forwardedscheme" id="forwardedscheme">ForwardedScheme</a></h3>
-<p><code>ForwardedSchemeMiddleware</code> detects the original request scheme from <code>X-Forwarded-Proto</code> header and sets it on the request.</p>
+<h3><a href="#forwarded" id="forwarded">Forwarded</a></h3>
+<p><code>ForwardedMiddleware</code> applies forwarded-address information from trusted reverse proxies.<br />
+It supports both the standard <code>Forwarded</code> header (RFC 7239) and the legacy <code>X-Forwarded-For</code>,<br />
+<code>X-Forwarded-Proto</code>, and <code>X-Forwarded-Host</code> headers. Headers are only trusted when the<br />
+direct connection&rsquo;s remote address matches a configured trusted proxy CIDR range,<br />
+preventing header spoofing by untrusted clients.</p>
+<p>When headers are trusted, the middleware updates <code>remoteAddr</code>, <code>scheme</code>, and <code>serverName</code><br />
+on the request.</p>
 <h4><a href="#usage" id="usage">Usage</a></h4>
-<pre><code class="language-java">app.use(new ForwardedSchemeMiddleware());
+<pre><code class="language-java">// Default — trusts loopback only (127.0.0.0/8 and ::1/128)
+app.use(new ForwardedMiddleware());
+
+// With a custom trusted proxy range
+ForwardedMiddleware fw = new ForwardedMiddleware();
+fw.setTrustedProxies(List.of(&quot;10.0.0.0/8&quot;, &quot;172.16.0.0/12&quot;, &quot;127.0.0.0/8&quot;, &quot;::1/128&quot;));
+app.use(fw);
 </code></pre>
+<h4><a href="#configuration" id="configuration">Configuration</a></h4>
+<table>
+<thead>
+<tr><th> Property </th><th> Type </th><th> Default </th><th> Description </th></tr>
+</thead>
+<tbody>
+<tr><td> <code>trustedProxies</code> </td><td> <code>List&lt;String&gt;</code> </td><td> <code>[&quot;127.0.0.0/8&quot;, &quot;::1/128&quot;]</code> </td><td> CIDR ranges of trusted proxies </td></tr>
+<tr><td> <code>preferStandard</code> </td><td> <code>boolean</code> </td><td> <code>true</code> </td><td> Prefer RFC 7239 <code>Forwarded</code> over legacy <code>X-Forwarded-*</code> when both are present </td></tr>
+</tbody>
+</table>
 <h3><a href="#cachecontrol" id="cachecontrol">CacheControl</a></h3>
 <p>Sets <code>Cache-Control</code> response headers based on configurable rules.<br />
 A <code>staticPattern</code> regex distinguishes static assets from dynamic responses.<br />

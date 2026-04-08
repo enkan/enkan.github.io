@@ -152,7 +152,25 @@ You can:</p>
 <li>Inspect the live middleware stack and routing table</li>
 <li>Execute arbitrary Java expressions against live components (database, cache, etc.)</li>
 <li>Test domain objects interactively without writing test classes</li>
+<li>Scaffold an entirely new Enkan project with <a href="../reference/repl.html#init"><code>/init</code></a> (AI-assisted)</li>
 </ul>
+<hr />
+<h2><a href="#the-enkan-repl-client-standalone-client" id="the-enkan-repl-client-standalone-client">The <code>enkan-repl-client</code> Standalone Client</a></h2>
+<p>Enkan ships a standalone client jar (<code>enkan-repl-client.jar</code>) published with every<br />
+<a href="https://github.com/enkan/enkan/releases/latest">release</a>. It has two primary uses:</p>
+<ul>
+<li><strong>Scaffolding a new project</strong> from scratch via the client-local <code>/init</code> command —<br />
+no project checkout, no build setup required. See<br />
+<a href="../getting-started.html">Getting Started</a> for the walkthrough.</li>
+<li><strong>Attaching to a running Enkan application</strong> over ZeroMQ, to inspect or manipulate<br />
+the live system (see <a href="#connecting-to-a-remote-process">Connecting to a Remote Process</a> below).</li>
+</ul>
+<pre><code class="language-bash">java -jar enkan-repl-client.jar           # disconnected shell; /init and /connect work
+java -jar enkan-repl-client.jar 64815     # connect immediately to port 64815
+</code></pre>
+<p>At the disconnected prompt (<code>enkan ✗ ❯</code>), the client-local commands<br />
+(<code>/init</code>, <code>/help</code>, <code>/connect</code>, <code>/exit</code>) are available. Once connected<br />
+(<code>enkan(64815)❯</code>), all commands registered on the server are also available.</p>
 <hr />
 <h2><a href="#starting-the-repl" id="starting-the-repl">Starting the REPL</a></h2>
 <p>Bootstrap the REPL from your <code>main</code> method:</p>

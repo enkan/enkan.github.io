@@ -373,6 +373,39 @@ Uses virtual threads by default for high-throughput request handling.</p>
   &lt;artifactId&gt;enkan-component-jackson&lt;/artifactId&gt;
 &lt;/dependency&gt;
 </code></pre>
+<h2><a href="#localjobexecutor" id="localjobexecutor">LocalJobExecutor</a></h2>
+<p><code>LocalJobExecutor</code> is the default <code>JobExecutor</code> implementation for background task submission.<br />
+It uses virtual threads (<code>Executors.newThreadPerTaskExecutor</code>) so thousands of concurrent jobs<br />
+can run without a fixed thread pool limit. Required when using Server-Sent Events (SSE).</p>
+<h3><a href="#usage" id="usage">Usage</a></h3>
+<pre><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;net.unit8.enkan&lt;/groupId&gt;
+  &lt;artifactId&gt;enkan-system&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+<pre><code class="language-java">EnkanSystem system = EnkanSystem.of(
+    &quot;jobExecutor&quot;, new LocalJobExecutor(),
+    &quot;app&quot;,         new ApplicationComponent(AppFactory.class.getName()),
+    &quot;http&quot;,        new JettyComponent()
+).relationships(
+    component(&quot;app&quot;).using(&quot;jobExecutor&quot;),
+    component(&quot;http&quot;).using(&quot;app&quot;)
+);
+</code></pre>
+<h3><a href="#properties" id="properties">Properties</a></h3>
+<table>
+<thead>
+<tr><th align="left"> Name </th><th align="left"> Type </th><th align="left"> Description </th><th align="left"> Default </th></tr>
+</thead>
+<tbody>
+<tr><td align="left"> <code>name</code> </td><td align="left"> <code>String</code> </td><td align="left"> Virtual thread name prefix </td><td align="left"> <code>&quot;enkan-job&quot;</code> </td></tr>
+<tr><td align="left"> <code>shutdownTimeoutMs</code> </td><td align="left"> <code>long</code> </td><td align="left"> Graceful shutdown wait (ms) </td><td align="left"> <code>30000</code> </td></tr>
+</tbody>
+</table>
+<h3><a href="#dependencies" id="dependencies">Dependencies</a></h3>
+<ul>
+<li>None</li>
+</ul>
 <h2><a href="#micrometer" id="micrometer">Micrometer</a></h2>
 <p>Micrometer component provides application metrics via the <a href="https://micrometer.io/">Micrometer</a> facade.<br />
 Supports Prometheus, Datadog, CloudWatch, and other backends via pluggable <code>MeterRegistry</code>.</p>

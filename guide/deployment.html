@@ -226,6 +226,8 @@ DATABASE_URL=jdbc:h2:mem:dev
 <tr><td> SSL port </td><td> <code>setSslPort(int)</code> </td><td> <code>443</code> </td><td> HTTPS listen port </td></tr>
 <tr><td> Keystore path </td><td> <code>setKeystorePath(String)</code> </td><td> — </td><td> Path to JKS keystore </td></tr>
 <tr><td> Keystore password </td><td> <code>setKeystorePassword(String)</code> </td><td> — </td><td> Keystore password </td></tr>
+<tr><td> Pre-stop delay </td><td> <code>setPreStopDelay(long)</code> </td><td> <code>0</code> </td><td> Milliseconds to keep serving after shutdown begins </td></tr>
+<tr><td> Stop timeout </td><td> <code>setStopTimeout(long)</code> </td><td> <code>30000</code> </td><td> Milliseconds to wait for in-flight requests </td></tr>
 </tbody>
 </table>
 <h3><a href="#https-example" id="https-example">HTTPS example</a></h3>
@@ -237,6 +239,39 @@ DATABASE_URL=jdbc:h2:mem:dev
     .set(JettyComponent::setKeystorePassword, Env.get(&quot;KEYSTORE_PASSWORD&quot;))
     .build()
 </code></pre>
+<hr />
+<h2><a href="#graceful-shutdown" id="graceful-shutdown">Graceful Shutdown</a></h2>
+<p>When stopping, Enkan web server components follow a three-phase shutdown sequence:</p>
+<ol>
+<li><strong>Pre-stop delay</strong> — The component reports <code>STOPPING</code> health status but continues to serve requests. This gives load balancers and Kubernetes Endpoints time to stop routing new traffic to the pod.</li>
+<li><strong>Drain</strong> — The server stops accepting new connections and waits for in-flight requests to complete.</li>
+<li><strong>Force stop</strong> — After the timeout, the server is forcefully stopped.</li>
+</ol>
+<h3><a href="#configuration" id="configuration">Configuration</a></h3>
+<pre><code class="language-java">builder(new JettyComponent())
+    .set(JettyComponent::setPort, Env.getInt(&quot;PORT&quot;, 3000))
+    .set(JettyComponent::setPreStopDelay, 5000)  // 5s for Endpoints propagation
+    .set(JettyComponent::setStopTimeout, 25000)   // 25s drain
+    .build()
+</code></pre>
+<h3><a href="#kubernetes-deployment" id="kubernetes-deployment">Kubernetes deployment</a></h3>
+<p>Set <code>preStopDelay + stopTimeout</code> to be less than the pod&rsquo;s <code>terminationGracePeriodSeconds</code> (default 30s) to ensure the JVM exits cleanly before Kubernetes sends SIGKILL:</p>
+<pre><code class="language-yaml">spec:
+  terminationGracePeriodSeconds: 35
+</code></pre>
+<h3><a href="#health-status-lifecycle" id="health-status-lifecycle">Health status lifecycle</a></h3>
+<p>The <code>HealthCheckable</code> interface reports four states that map to Kubernetes probes:</p>
+<table>
+<thead>
+<tr><th> HealthStatus </th><th> Readiness </th><th> Liveness </th><th> Meaning </th></tr>
+</thead>
+<tbody>
+<tr><td> <code>STARTING</code> </td><td> not ready </td><td> alive </td><td> Initializing — don&rsquo;t send traffic, don&rsquo;t kill </td></tr>
+<tr><td> <code>UP</code> </td><td> ready </td><td> alive </td><td> Normal operation </td></tr>
+<tr><td> <code>STOPPING</code> </td><td> not ready </td><td> alive </td><td> Draining — stop sending traffic, don&rsquo;t kill </td></tr>
+<tr><td> <code>DOWN</code> </td><td> not ready </td><td> dead </td><td> Failed — restart </td></tr>
+</tbody>
+</table>
 <hr />
 <h2><a href="#database-migrations" id="database-migrations">Database Migrations</a></h2>
 <p><a href="../reference/components.md">FlywayMigration</a> runs migrations automatically when the component starts.<br />

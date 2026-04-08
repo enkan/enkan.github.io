@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset=utf-8"/>
+    <title>WebSocket &amp; SSE | Enkan</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
+  </head>
+  <body id="page-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+          <img src="../img/logo.png" alt="enkan logo" class="navbar-logo">enkan
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bs-navbar-collapse-1" aria-controls="bs-navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../getting-started.html">Docs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/enkan/enkan">GitHub</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  <div class="container">
+  <div class="row">
+    <aside class="col-lg-2">
+<nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
+  <h3>Quick Start</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../getting-started.html">
+        Getting Started
+      </a>
+    </li>
+  </ul>
+
+  <h3>Guide</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../guide/why-enkan.html">
+        Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/repl.html">
+        REPL-Driven Development
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/enkan-system.html">
+        Enkan system
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/application-factory.html">
+        Application factory
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/controller.html">
+        Controller
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/content-negotiation.html">
+        Content negotiation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/session.html">
+        Session
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/conversation.html">
+        Conversation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/authentication.html">
+        Authentication
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/file-uploading.html">
+        File uploading
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/development.html">
+        Development tools
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/testing.html">
+        Testing
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/deployment.html">
+        Deployment
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/spring-boot-comparison.html">
+        Spring Boot Comparison
+      </a>
+    </li>
+  </ul>
+
+  <h3>Reference</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../reference/middlewares.html">Middleware</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/components.html">Components</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/repl.html">REPL commands</a>
+    </li>
+  </ul>
+</nav>
+    </aside>
+    <section class="col-lg-10">
+      <div class="row">
+        <div class="col-12">
+        <h1><a href="#real-time-websocket-server-sent-events" id="real-time-websocket-server-sent-events">Real-time: WebSocket &amp; Server-Sent Events</a></h1>
+<p>Enkan supports two push-communication patterns built on virtual threads:<br />
+<strong>WebSocket</strong> for full-duplex messaging, and <strong>Server-Sent Events (SSE)</strong> for<br />
+server-to-client streaming.</p>
+<hr />
+<h2><a href="#websocket" id="websocket">WebSocket</a></h2>
+<p>WebSocket support is provided by <code>enkan-component-jetty</code>. Handlers are<br />
+registered on <code>JettyComponent</code> before the server starts.</p>
+<h3><a href="#implement-a-handler" id="implement-a-handler">Implement a handler</a></h3>
+<p>Implement the <code>WebSocketHandler</code> interface:</p>
+<pre><code class="language-java">import enkan.web.websocket.WebSocketHandler;
+import enkan.web.websocket.WebSocketSession;
+
+public class ChatHandler implements WebSocketHandler {
+
+    @Override
+    public void onOpen(WebSocketSession session) {
+        // Called when the client connects
+        session.sendText(&quot;Welcome!&quot;);
+    }
+
+    @Override
+    public void onMessage(WebSocketSession session, String message) {
+        // Echo back
+        session.sendText(&quot;Echo: &quot; + message);
+    }
+
+    @Override
+    public void onClose(WebSocketSession session, int statusCode, String reason) {
+        // RFC 6455 status code, e.g. 1000 = normal close
+    }
+
+    @Override
+    public void onError(WebSocketSession session, Throwable cause) {
+        // Handle errors; session may or may not still be open
+    }
+}
+</code></pre>
+<p>Binary messages can be handled by overriding the default <code>onBinary</code> method:</p>
+<pre><code class="language-java">@Override
+public void onBinary(WebSocketSession session, java.nio.ByteBuffer data) {
+    // process binary frame
+}
+</code></pre>
+<h3><a href="#register-on-jettycomponent" id="register-on-jettycomponent">Register on JettyComponent</a></h3>
+<pre><code class="language-java">import enkan.component.jetty.JettyComponent;
+
+JettyComponent jetty = new JettyComponent()
+    .addWebSocket(&quot;/ws/chat&quot;, new ChatHandler())
+    .addWebSocket(&quot;/ws/notify&quot;, new NotifyHandler());
+</code></pre>
+<p><code>addWebSocket</code> must be called <strong>before</strong> the component starts. It is chainable<br />
+and returns <code>this</code>. Calling it after start throws <code>MisconfigurationException</code>.</p>
+<p>Path syntax follows Jetty&rsquo;s path-mapping rules:<br />
+- <code>/ws/chat</code> — exact match<br />
+- <code>/ws/*</code> — prefix wildcard</p>
+<h3><a href="#websocketsession-api" id="websocketsession-api">WebSocketSession API</a></h3>
+<table>
+<thead>
+<tr><th> Method </th><th> Description </th></tr>
+</thead>
+<tbody>
+<tr><td> <code>getId()</code> </td><td> Unique session identifier </td></tr>
+<tr><td> <code>isOpen()</code> </td><td> Whether the connection is still open </td></tr>
+<tr><td> <code>sendText(String)</code> </td><td> Send a UTF-8 text frame (async) </td></tr>
+<tr><td> <code>sendBinary(ByteBuffer)</code> </td><td> Send a binary frame (async; buffer is defensively copied) </td></tr>
+<tr><td> <code>close()</code> </td><td> Normal close (status 1000) </td></tr>
+<tr><td> <code>close(int, String)</code> </td><td> Close with RFC 6455 status and reason </td></tr>
+</tbody>
+</table>
+<h3><a href="#broadcasting-to-multiple-clients" id="broadcasting-to-multiple-clients">Broadcasting to multiple clients</a></h3>
+<p>Maintain your own session registry:</p>
+<pre><code class="language-java">public class ChatHandler implements WebSocketHandler {
+    private final Set&lt;WebSocketSession&gt; sessions =
+        Collections.newSetFromMap(new ConcurrentHashMap&lt;&gt;());
+
+    @Override
+    public void onOpen(WebSocketSession session) {
+        sessions.add(session);
+    }
+
+    @Override
+    public void onMessage(WebSocketSession session, String message) {
+        sessions.stream()
+            .filter(WebSocketSession::isOpen)
+            .forEach(s -&gt; s.sendText(message));
+    }
+
+    @Override
+    public void onClose(WebSocketSession session, int code, String reason) {
+        sessions.remove(session);
+    }
+
+    @Override
+    public void onError(WebSocketSession session, Throwable cause) {
+        sessions.remove(session);
+    }
+}
+</code></pre>
+<hr />
+<h2><a href="#server-sent-events-sse" id="server-sent-events-sse">Server-Sent Events (SSE)</a></h2>
+<p>SSE is a standard HTTP streaming protocol where the server pushes events to the<br />
+client over a single long-lived connection. It requires no special component —<br />
+any server (Jetty, Undertow) works.</p>
+<h3><a href="#core-types" id="core-types">Core types</a></h3>
+<table>
+<thead>
+<tr><th> Type </th><th> Role </th></tr>
+</thead>
+<tbody>
+<tr><td> <code>SseEmitter</code> </td><td> Bridge between event producer and the HTTP connection </td></tr>
+<tr><td> <code>SseEvent</code> </td><td> Immutable record representing a single SSE frame </td></tr>
+<tr><td> <code>JobExecutor</code> </td><td> Background executor (virtual threads) for event producers </td></tr>
+</tbody>
+</table>
+<h3><a href="#register-the-route" id="register-the-route">Register the route</a></h3>
+<pre><code class="language-java">Routes routes = Routes.define(r -&gt; {
+    r.get(&quot;/events&quot;).to(EventController.class, &quot;stream&quot;);
+}).compile();
+</code></pre>
+<h3><a href="#write-a-streaming-controller" id="write-a-streaming-controller">Write a streaming controller</a></h3>
+<pre><code class="language-java">import enkan.web.data.SseEmitter;
+import enkan.web.data.SseEvent;
+import enkan.component.JobExecutor;
+import enkan.data.HttpResponse;
+import enkan.web.collection.Headers;
+
+import jakarta.inject.Inject;
+import java.time.Duration;
+
+public class EventController {
+
+    @Inject
+    private JobExecutor jobExecutor;
+
+    public HttpResponse stream() {
+        // Bounded queue — natural back-pressure for slow clients
+        SseEmitter emitter = new SseEmitter(100);
+
+        jobExecutor.submit(() -&gt; {
+            try {
+                for (int i = 0; i &lt; 10; i++) {
+                    emitter.send(SseEvent.builder()
+                        .event(&quot;update&quot;)
+                        .data(&quot;{\&quot;count\&quot;:&quot; + i + &quot;}&quot;)
+                        .id(&quot;msg-&quot; + i)
+                        .build());
+                    Thread.sleep(1000);
+                }
+            } finally {
+                emitter.complete(); // Always call complete() — even on exception
+            }
+        });
+
+        return HttpResponse.of(emitter)
+            .setHeaders(Headers.of(
+                &quot;Content-Type&quot;, &quot;text/event-stream&quot;,
+                &quot;Cache-Control&quot;, &quot;no-cache&quot;,
+                &quot;X-Accel-Buffering&quot;, &quot;no&quot;  // Disable nginx proxy buffering
+            ));
+    }
+}
+</code></pre>
+<h3><a href="#sseevent-construction" id="sseevent-construction">SseEvent construction</a></h3>
+<pre><code class="language-java">// Simple data-only event
+SseEvent.of(&quot;Hello, world!&quot;);
+
+// Full event
+SseEvent.builder()
+    .data(&quot;{\&quot;key\&quot;:\&quot;value\&quot;}&quot;)  // required
+    .event(&quot;update&quot;)              // optional; omit for default &quot;message&quot; type
+    .id(&quot;event-42&quot;)               // optional; used by client for reconnection
+    .retry(Duration.ofSeconds(5)) // optional; reconnection delay hint
+    .build();
+
+// Keep-alive comment (prevents proxy timeouts)
+SseEvent.keepAlive();
+</code></pre>
+<h3><a href="#sseemitter-sizing" id="sseemitter-sizing">SseEmitter sizing</a></h3>
+<table>
+<thead>
+<tr><th> Constructor </th><th> Behaviour </th></tr>
+</thead>
+<tbody>
+<tr><td> <code>new SseEmitter()</code> </td><td> Unbounded queue — risk of memory growth if client is slow </td></tr>
+<tr><td> <code>new SseEmitter(int capacity)</code> </td><td> Bounded queue — <code>send()</code> blocks when full (back-pressure) </td></tr>
+</tbody>
+</table>
+<p>Always call <code>emitter.complete()</code> in a <code>finally</code> block. If <code>complete()</code> is never<br />
+called the virtual thread running <code>writeTo()</code> blocks until the executor shuts down.</p>
+<h3><a href="#wire-up-jobexecutor" id="wire-up-jobexecutor">Wire up JobExecutor</a></h3>
+<p><code>JobExecutor</code> is an <code>enkan-system</code> component. The default implementation<br />
+<code>LocalJobExecutor</code> uses virtual threads.</p>
+<pre><code class="language-java">// SystemFactory
+EnkanSystem system = EnkanSystem.of(
+    &quot;jobExecutor&quot;, new LocalJobExecutor(),
+    &quot;app&quot;,         new ApplicationComponent(AppFactory.class.getName()),
+    &quot;http&quot;,        new JettyComponent()
+).relationships(
+    component(&quot;app&quot;).using(&quot;jobExecutor&quot;),
+    component(&quot;http&quot;).using(&quot;app&quot;)
+);
+</code></pre>
+<pre><code class="language-java">// ApplicationFactory — inject into controllers
+app.use(new ControllerInvokerMiddleware(system));
+</code></pre>
+<pre><code class="language-java">// Controller
+public class EventController {
+    @Inject
+    private JobExecutor jobExecutor;
+    ...
+}
+</code></pre>
+<p><code>LocalJobExecutor</code> configuration:</p>
+<table>
+<thead>
+<tr><th> Property </th><th> Type </th><th> Default </th><th> Description </th></tr>
+</thead>
+<tbody>
+<tr><td> <code>name</code> </td><td> <code>String</code> </td><td> <code>&quot;enkan-job&quot;</code> </td><td> Thread name prefix </td></tr>
+<tr><td> <code>shutdownTimeoutMs</code> </td><td> <code>long</code> </td><td> <code>30000</code> </td><td> Graceful shutdown wait (ms) </td></tr>
+</tbody>
+</table>
+<h3><a href="#keep-alive-for-long-idle-streams" id="keep-alive-for-long-idle-streams">Keep-alive for long idle streams</a></h3>
+<p>Some proxies close connections that carry no data for 30–60 seconds. Send a<br />
+periodic keep-alive comment:</p>
+<pre><code class="language-java">jobExecutor.submit(() -&gt; {
+    try {
+        while (!done()) {
+            Object event = queue.poll(20, TimeUnit.SECONDS);
+            if (event == null) {
+                emitter.send(SseEvent.keepAlive());
+            } else {
+                emitter.send(toSseEvent(event));
+            }
+        }
+    } finally {
+        emitter.complete();
+    }
+});
+</code></pre>
+<hr />
+<h2><a href="#choosing-between-websocket-and-sse" id="choosing-between-websocket-and-sse">Choosing between WebSocket and SSE</a></h2>
+<table>
+<thead>
+<tr><th> </th><th> WebSocket </th><th> SSE </th></tr>
+</thead>
+<tbody>
+<tr><td> Direction </td><td> Full-duplex </td><td> Server → Client only </td></tr>
+<tr><td> Protocol </td><td> WS / WSS </td><td> Plain HTTP </td></tr>
+<tr><td> Reconnection </td><td> Manual </td><td> Built into browser </td></tr>
+<tr><td> Proxy support </td><td> Requires upgrade </td><td> Works everywhere </td></tr>
+<tr><td> Use case </td><td> Chat, games, collaborative editing </td><td> Dashboards, notifications, progress bars </td></tr>
+</tbody>
+</table>
+
+        </div>
+      </div>
+    </section>
+  </div>
+  </div>
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 offset-lg-8 text-end">
+            © 2016–2026 kawasima<br/>
+            Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
+  </body>
+</html>

@@ -137,22 +137,138 @@
       <div class="row">
         <div class="col-12">
         <h1><a href="#getting-started" id="getting-started">Getting started</a></h1>
+<p>Enkan is a middleware-chain-based web framework for Java 25. Its core idea is<br />
+<strong>explicitness over convention</strong>: every component, every middleware, and every<br />
+dependency is declared in plain Java code — no classpath scanning, no<br />
+auto-configuration, no magic.</p>
+<p>The fastest path from zero to a running application is the <code>/init</code> command,<br />
+which turns a plain-English description of your app into a compilable project<br />
+skeleton in minutes.</p>
 <h2><a href="#prerequisite" id="prerequisite">Prerequisite</a></h2>
 <ul>
 <li>Java 25 or higher</li>
 <li>Maven 3.6.3 or higher</li>
+<li>An API key for an OpenAI-compatible chat completion endpoint (only for <code>/init</code>)</li>
 </ul>
-<h2><a href="#add-the-dependency" id="add-the-dependency">Add the dependency</a></h2>
-<p>Add <code>kotowari</code> (MVC framework) and a server component to your <code>pom.xml</code>:</p>
+<hr />
+<h2><a href="#scaffold-a-project-with-init-recommended" id="scaffold-a-project-with-init-recommended">Scaffold a project with <code>/init</code> (recommended)</a></h2>
+<p><code>/init</code> is the entry point to the Enkan ecosystem. It is an AI-powered project<br />
+generator built into the standalone REPL client. You describe your application<br />
+in natural language, review a generated plan, and <code>init</code> writes a compilable<br />
+project skeleton — complete with routing, controllers, domain records, database<br />
+migrations, and a development REPL server — then compiles it and optionally<br />
+starts it for you.</p>
+<p>No Enkan knowledge is required to run <code>/init</code>. It is intentionally designed as<br />
+<strong>the first thing a new user does</strong>.</p>
+<pre><code>You describe your app
+        ↓
+/init collects requirements interactively
+        ↓
+LLM generates a plan (you can revise it)
+        ↓
+Project files are written
+        ↓
+mvn compile runs (with auto-fix loop)
+        ↓
+App starts + REPL connects
+        ↓
+You are live inside a running Enkan application
+</code></pre>
+<h3><a href="#1-download-the-repl-client" id="1-download-the-repl-client">1. Download the REPL client</a></h3>
+<p>Grab the standalone client jar from the<br />
+<a href="https://github.com/enkan/enkan/releases/latest">latest release</a>:</p>
+<pre><code class="language-bash">curl -L -o enkan-repl-client.jar \
+  https://github.com/enkan/enkan/releases/latest/download/enkan-repl-client.jar
+</code></pre>
+<h3><a href="#2-configure-the-llm-endpoint" id="2-configure-the-llm-endpoint">2. Configure the LLM endpoint</a></h3>
+<p><code>/init</code> uses an OpenAI-compatible chat completion API. It works with OpenAI,<br />
+Anthropic&rsquo;s <a href="https://docs.anthropic.com/en/api/openai-sdk">OpenAI-compatible endpoint</a>,<br />
+LM Studio, Ollama, vLLM, and any other server that speaks the same protocol.</p>
+<table>
+<thead>
+<tr><th> Env var </th><th> System property </th><th> Default </th></tr>
+</thead>
+<tbody>
+<tr><td> <code>ENKAN_AI_API_URL</code> </td><td> <code>enkan.ai.apiUrl</code> </td><td> <code>https://api.anthropic.com/v1</code> </td></tr>
+<tr><td> <code>ENKAN_AI_API_KEY</code> </td><td> <code>enkan.ai.apiKey</code> </td><td> <em>(required)</em> </td></tr>
+<tr><td> <code>ENKAN_AI_MODEL</code> </td><td> <code>enkan.ai.model</code> </td><td> <code>claude-sonnet-4-5</code> </td></tr>
+</tbody>
+</table>
+<p>The URL may be either a base (<code>/v1</code>) or the full path (<code>/v1/chat/completions</code>) —<br />
+both are accepted.</p>
+<pre><code class="language-bash">export ENKAN_AI_API_KEY=sk-...
+</code></pre>
+<h3><a href="#3-run-init" id="3-run-init">3. Run <code>/init</code></a></h3>
+<pre><code class="language-bash">java -jar enkan-repl-client.jar
+</code></pre>
+<pre><code>  Enkan Project Generator
+
+── Project Setup ─────────────────────────
+? What kind of application do you want to build? REST API for a bookstore
+? Project name [rest-api-bookstore]:
+? Group ID [com.example]:
+? Output directory [./rest-api-bookstore]:
+
+── Plan Draft ────────────────────────────
+(the LLM shows a proposed plan — components, routes, file list)
+Plan feedback (say 'yes' to proceed, or describe changes, 'cancel' to abort) &gt; yes
+
+── Generating ────────────────────────────
+  ✓ src/main/java/.../BookstoreApplicationFactory.java
+  ✓ src/main/java/.../BookController.java
+  ...
+
+✓ Done! Created 5 file(s)
+
+── Compiling ─────────────────────────────
+✓ Compilation succeeded.
+
+? Start and connect to the generated app? [Y]:
+⚡ Starting app (mvn compile exec:exec -Pdev)...
+Connected to server (port = 3001)
+enkan(3001)❯
+</code></pre>
+<p>At the <code>enkan(3001)❯</code> prompt you are connected to a running REPL server inside<br />
+your new project. From here you can run <a href="reference/repl.html#routes-app"><code>/routes</code></a>,<br />
+<a href="guide/repl.html"><code>/start</code>, <code>/stop</code>, <code>/reset</code></a>, or evaluate live Java expressions.</p>
+<h3><a href="#what-init-generates" id="what-init-generates">What <code>/init</code> generates</a></h3>
+<p><code>/init</code> writes the following files verbatim (without touching the LLM), so the<br />
+scaffold is always consistent:</p>
+<ul>
+<li><code>pom.xml</code> — including the <code>dev</code> profile that runs <code>DevMain</code></li>
+<li><code>src/dev/java/.../DevMain.java</code> — starts the REPL server</li>
+<li><code>src/main/java/.../&lt;Project&gt;SystemFactory.java</code> — minimal <code>EnkanSystem.of(...)</code> skeleton</li>
+</ul>
+<p>The LLM then fills in the <code>ApplicationFactory</code>, controllers, and domain classes<br />
+based on your approved plan. The default generated stack is:</p>
+<table>
+<thead>
+<tr><th> Layer </th><th> Technology </th></tr>
+</thead>
+<tbody>
+<tr><td> HTTP server </td><td> Jetty (virtual threads) </td></tr>
+<tr><td> MVC </td><td> Kotowari </td></tr>
+<tr><td> JSON </td><td> Jackson </td></tr>
+<tr><td> Connection pool </td><td> HikariCP </td></tr>
+<tr><td> SQL </td><td> jOOQ </td></tr>
+<tr><td> Row mapping </td><td> Raoh </td></tr>
+<tr><td> Migrations </td><td> Flyway </td></tr>
+<tr><td> Database </td><td> H2 (in-memory, dev) </td></tr>
+</tbody>
+</table>
+<hr />
+<h2><a href="#manual-setup" id="manual-setup">Manual setup</a></h2>
+<p>If you prefer to wire everything by hand, add <code>kotowari</code> (MVC framework) and a<br />
+server component to your <code>pom.xml</code>:</p>
 <pre><code class="language-xml">&lt;dependency&gt;
   &lt;groupId&gt;net.unit8.enkan&lt;/groupId&gt;
   &lt;artifactId&gt;kotowari&lt;/artifactId&gt;
-  &lt;version&gt;0.14.1&lt;/version&gt;
+  &lt;version&gt;0.15.0&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
   &lt;groupId&gt;net.unit8.enkan&lt;/groupId&gt;
   &lt;artifactId&gt;enkan-component-jetty&lt;/artifactId&gt;
-  &lt;version&gt;0.14.1&lt;/version&gt;
+  &lt;version&gt;0.15.0&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 <p>If you only need the middleware core without MVC routing, use <code>enkan-web</code> instead of <code>kotowari</code>.</p>
@@ -225,6 +341,9 @@ public class MySystemFactory {
 <li><a href="guide/why-enkan.html">Why Enkan?</a> — design philosophy and comparison with other frameworks</li>
 <li><a href="guide/enkan-system.html">EnkanSystem</a> — component lifecycle and dependency wiring</li>
 <li><a href="guide/controller.html">Controllers</a> — parameter injection, form handling, templates</li>
+<li><a href="guide/websocket.html">Real-time: WebSocket &amp; SSE</a> — push updates and streaming</li>
+<li><a href="guide/security.html">Security</a> — JWT, CSP nonce, HTTP Signatures, Fetch Metadata</li>
+<li><a href="guide/graalvm.html">GraalVM &amp; CRaC</a> — native images and instant restore</li>
 <li><a href="reference/components.html">Component Catalog</a> — all available components and their configuration</li>
 <li><a href="reference/middlewares.html">Middleware Reference</a> — all available middleware</li>
 </ul>

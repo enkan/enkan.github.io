@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset=utf-8"/>
+    <title>Security | Enkan</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
+  </head>
+  <body id="page-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+          <img src="../img/logo.png" alt="enkan logo" class="navbar-logo">enkan
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bs-navbar-collapse-1" aria-controls="bs-navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../getting-started.html">Docs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/enkan/enkan">GitHub</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  <div class="container">
+  <div class="row">
+    <aside class="col-lg-2">
+<nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
+  <h3>Quick Start</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../getting-started.html">
+        Getting Started
+      </a>
+    </li>
+  </ul>
+
+  <h3>Guide</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../guide/why-enkan.html">
+        Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/repl.html">
+        REPL-Driven Development
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/enkan-system.html">
+        Enkan system
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/application-factory.html">
+        Application factory
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/controller.html">
+        Controller
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/content-negotiation.html">
+        Content negotiation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/session.html">
+        Session
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/conversation.html">
+        Conversation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/authentication.html">
+        Authentication
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/file-uploading.html">
+        File uploading
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/development.html">
+        Development tools
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/testing.html">
+        Testing
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/deployment.html">
+        Deployment
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/spring-boot-comparison.html">
+        Spring Boot Comparison
+      </a>
+    </li>
+  </ul>
+
+  <h3>Reference</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../reference/middlewares.html">Middleware</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/components.html">Components</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/repl.html">REPL commands</a>
+    </li>
+  </ul>
+</nav>
+    </aside>
+    <section class="col-lg-10">
+      <div class="row">
+        <div class="col-12">
+        <h1><a href="#security" id="security">Security</a></h1>
+<p>Enkan provides a layered security toolkit. Each feature is an independent<br />
+middleware or utility — compose only what your application needs.</p>
+<hr />
+<h2><a href="#security-headers" id="security-headers">Security headers</a></h2>
+<p><code>SecurityHeadersMiddleware</code> applies a safe set of HTTP response headers in one<br />
+middleware (similar to <a href="https://helmetjs.github.io/">Helmet.js</a> for Express).<br />
+See the <a href="../reference/middlewares.html#securityheaders">middleware reference</a> for<br />
+the full property list.</p>
+<pre><code class="language-java">app.use(new SecurityHeadersMiddleware());
+</code></pre>
+<hr />
+<h2><a href="#csrf-protection" id="csrf-protection">CSRF protection</a></h2>
+<p><code>AntiForgeryMiddleware</code> validates a token on every non-safe (<code>POST</code>, <code>PUT</code>,<br />
+<code>PATCH</code>, <code>DELETE</code>) request. The token is stored in the session and must be<br />
+submitted as the <code>__anti-forgery-token</code> form field or <code>X-CSRF-Token</code> header.</p>
+<pre><code class="language-java">app.use(new SessionMiddleware());   // must be upstream
+app.use(new AntiForgeryMiddleware());
+</code></pre>
+<p>For multi-step flows consider using <code>ConversationMiddleware</code> instead, which<br />
+provides built-in state protection without a separate CSRF token.</p>
+<hr />
+<h2><a href="#csp-nonce" id="csp-nonce">CSP nonce</a></h2>
+<p><code>CspNonceMiddleware</code> generates a fresh cryptographically random nonce<br />
+(128-bit, Base64url) for every request and injects it into the <code>script-src</code><br />
+directive of <code>Content-Security-Policy</code>. Place it <strong>before</strong> (outer of)<br />
+<code>SecurityHeadersMiddleware</code> — it generates the nonce on the way in,<br />
+then rewrites the CSP header that <code>SecurityHeadersMiddleware</code> sets on the way out.</p>
+<pre><code class="language-java">CspNonceMiddleware nonce = new CspNonceMiddleware();
+nonce.setStrictDynamic(true); // recommended for SPA-style inline bootstrapping
+app.use(nonce);                           // outer (runs first)
+app.use(new SecurityHeadersMiddleware()); // inner (runs after)
+</code></pre>
+<p>Read the nonce in a controller or template:</p>
+<pre><code class="language-java">String nonce = request.getExtension(CspNonceMiddleware.EXTENSION_KEY);
+</code></pre>
+<pre><code class="language-html">&lt;!-- Thymeleaf --&gt;
+&lt;script th:nonce=&quot;${#request.getExtension('cspNonce')}&quot;&gt;
+  const data = /* ... */;
+&lt;/script&gt;
+</code></pre>
+<hr />
+<h2><a href="#fetch-metadata" id="fetch-metadata">Fetch Metadata</a></h2>
+<p><code>FetchMetadataMiddleware</code> implements the W3C<br />
+<a href="https://www.w3.org/TR/fetch-metadata/">Resource Isolation Policy</a> using<br />
+<code>Sec-Fetch-Site</code> and <code>Sec-Fetch-Mode</code> headers. It blocks cross-origin<br />
+non-navigational requests by default, defending against CSRF, XSSI, and<br />
+cross-origin information leaks.</p>
+<pre><code class="language-java">FetchMetadataMiddleware fm = new FetchMetadataMiddleware();
+// Add paths that must be reachable from other origins (public APIs, webhooks)
+fm.setAllowedPaths(Set.of(&quot;/api/public/items&quot;, &quot;/webhooks/stripe&quot;));
+app.use(fm);
+</code></pre>
+<p>Browsers that do not send <code>Sec-Fetch-*</code> headers (non-browser clients, older<br />
+browsers) are always allowed through. Use alongside CSRF tokens for full coverage.</p>
+<p><strong>CORS interaction:</strong> if you use <code>CorsMiddleware</code>, CORS-enabled paths must also<br />
+appear in <code>allowedPaths</code> so that preflight (<code>OPTIONS</code>) requests reach<br />
+<code>CorsMiddleware</code> without being blocked first.</p>
+<hr />
+<h2><a href="#jwt-json-web-tokens" id="jwt-json-web-tokens">JWT (JSON Web Tokens)</a></h2>
+<p><code>JwtProcessor</code> provides stateless JWT signing and verification with no external<br />
+JSON library dependency. It guards against algorithm confusion attacks and<br />
+validates <code>exp</code> / <code>nbf</code> time claims with a 60-second clock skew tolerance.</p>
+<h3><a href="#signing" id="signing">Signing</a></h3>
+<pre><code class="language-java">import enkan.web.jwt.JwtProcessor;
+import enkan.web.jwt.JwtHeader;
+import enkan.web.jwt.JwsAlgorithm;
+
+// Build the JOSE header
+JwtHeader header = new JwtHeader(&quot;HS256&quot;, &quot;my-key-id&quot;);
+
+// Serialize your claims to JSON bytes however you like
+byte[] claims = &quot;&quot;&quot;
+    {&quot;sub&quot;:&quot;user-42&quot;,&quot;exp&quot;:%d}
+    &quot;&quot;&quot;.formatted(Instant.now().plusSeconds(3600).getEpochSecond())
+    .getBytes(StandardCharsets.UTF_8);
+
+String token = JwtProcessor.sign(header, claims, secretKey);
+</code></pre>
+<h3><a href="#verification" id="verification">Verification</a></h3>
+<pre><code class="language-java">// Most secure: ignore header alg, enforce expected algorithm explicitly
+byte[] payload = JwtProcessor.verify(token, JwsAlgorithm.HS256, secretKey);
+if (payload == null) {
+    // token is invalid or expired
+}
+
+// With automatic deserialization
+MyClaims claims = JwtProcessor.verify(token, secretKey,
+    bytes -&gt; jsonMapper.readValue(bytes, MyClaims.class));
+</code></pre>
+<h3><a href="#supported-algorithms" id="supported-algorithms">Supported algorithms</a></h3>
+<table>
+<thead>
+<tr><th> Category </th><th> Values </th></tr>
+</thead>
+<tbody>
+<tr><td> HMAC </td><td> <code>HS256</code>, <code>HS384</code>, <code>HS512</code> </td></tr>
+<tr><td> RSA PKCS#1 v1.5 </td><td> <code>RS256</code>, <code>RS384</code>, <code>RS512</code> </td></tr>
+<tr><td> RSA-PSS </td><td> <code>PS256</code>, <code>PS384</code>, <code>PS512</code> </td></tr>
+<tr><td> ECDSA </td><td> <code>ES256</code>, <code>ES384</code>, <code>ES512</code> </td></tr>
+<tr><td> EdDSA </td><td> <code>EdDSA</code> </td></tr>
+</tbody>
+</table>
+<h3><a href="#tokenbackend-jwt-based-authentication" id="tokenbackend-jwt-based-authentication">TokenBackend — JWT-based authentication</a></h3>
+<p>Combine <code>JwtProcessor</code> with the built-in <code>TokenBackend</code> to authenticate<br />
+requests via <code>Authorization: Bearer &lt;token&gt;</code>:</p>
+<pre><code class="language-java">TokenBackend&lt;MyPrincipal&gt; backend = new TokenBackend&lt;&gt;(token -&gt; {
+    byte[] payload = JwtProcessor.verify(token, JwsAlgorithm.HS256, secretKey);
+    if (payload == null) return null;
+    String sub = extractSubject(payload);
+    return new MyPrincipal(sub);
+});
+
+app.use(new AuthenticationMiddleware(List.of(backend)));
+</code></pre>
+<hr />
+<h2><a href="#http-message-signatures-rfc-9421" id="http-message-signatures-rfc-9421">HTTP Message Signatures (RFC 9421)</a></h2>
+<p><code>SignatureVerificationMiddleware</code> verifies<br />
+<a href="https://www.rfc-editor.org/rfc/rfc9421">RFC 9421</a> HTTP Message Signatures on<br />
+incoming requests. Useful for webhook receivers, inter-service calls, and<br />
+open banking APIs.</p>
+<h3><a href="#implement-a-key-resolver" id="implement-a-key-resolver">Implement a key resolver</a></h3>
+<pre><code class="language-java">import enkan.web.signature.SignatureKeyResolver;
+import enkan.web.signature.SignatureAlgorithm;
+import enkan.security.crypto.Verifier;
+import enkan.security.crypto.JcaVerifier;
+
+SignatureKeyResolver keyResolver = (keyId, algorithm) -&gt; {
+    PublicKey key = keyStore.getPublicKey(keyId);  // your own key store
+    if (key == null) return Optional.empty();
+    return Optional.of(new JcaVerifier(algorithm.crypto(), key));
+};
+</code></pre>
+<h3><a href="#register-the-middleware" id="register-the-middleware">Register the middleware</a></h3>
+<pre><code class="language-java">SignatureVerificationMiddleware verify =
+    new SignatureVerificationMiddleware(keyResolver);
+
+// Only accept requests carrying a &quot;sig1&quot; label
+verify.setRequiredLabels(Set.of(&quot;sig1&quot;));
+
+// That label must cover at least these components
+verify.setRequiredComponents(Set.of(&quot;@method&quot;, &quot;@path&quot;, &quot;content-digest&quot;));
+
+// Advertise what we accept in 401 responses (Accept-Signature header)
+verify.setAcceptSignature(
+    &quot;sig1&quot;,
+    List.of(SignatureComponent.of(&quot;@method&quot;),
+            SignatureComponent.of(&quot;@path&quot;),
+            SignatureComponent.of(&quot;content-digest&quot;)),
+    SignatureAlgorithm.ED25519,
+    &quot;my-public-key-id&quot;
+);
+
+app.use(verify);
+</code></pre>
+<h3><a href="#read-verification-results-in-a-controller" id="read-verification-results-in-a-controller">Read verification results in a controller</a></h3>
+<pre><code class="language-java">import enkan.web.middleware.SignatureVerificationMiddleware;
+import enkan.web.signature.VerifyResult;
+
+public HttpResponse handle(HttpRequest request) {
+    List&lt;VerifyResult&gt; results =
+        request.getExtension(SignatureVerificationMiddleware.EXTENSION_KEY);
+    String keyId = results.get(0).keyId();
+    // ...
+}
+</code></pre>
+<h3><a href="#supported-signature-algorithms" id="supported-signature-algorithms">Supported signature algorithms</a></h3>
+<table>
+<thead>
+<tr><th> Category </th><th> Values </th></tr>
+</thead>
+<tbody>
+<tr><td> HMAC </td><td> <code>hmac-sha256</code>, <code>hmac-sha384</code>, <code>hmac-sha512</code> </td></tr>
+<tr><td> EdDSA </td><td> <code>ed25519</code> </td></tr>
+<tr><td> ECDSA </td><td> <code>ecdsa-p256-sha256</code>, <code>ecdsa-p384-sha384</code>, <code>ecdsa-p521-sha512</code> </td></tr>
+<tr><td> RSA-PSS </td><td> <code>rsa-pss-sha256</code>, <code>rsa-pss-sha384</code>, <code>rsa-pss-sha512</code> </td></tr>
+<tr><td> RSA v1.5 </td><td> <code>rsa-v1_5-sha256</code>, <code>rsa-v1_5-sha384</code>, <code>rsa-v1_5-sha512</code> </td></tr>
+</tbody>
+</table>
+<hr />
+<h2><a href="#content-digest-rfc-9530" id="content-digest-rfc-9530">Content Digest (RFC 9530)</a></h2>
+<p><code>DigestValidationMiddleware</code> validates <code>Content-Digest</code> / <code>Repr-Digest</code> request<br />
+headers per <a href="https://www.rfc-editor.org/rfc/rfc9530">RFC 9530</a>. It buffers the<br />
+request body, computes the digest, and returns 400 on mismatch.</p>
+<pre><code class="language-java">// Apply only to routes that require integrity verification
+app.use(new DigestValidationMiddleware(),
+        PathPredicate.of(&quot;/api/events/*&quot;));
+</code></pre>
+<p>On the server side (Jetty), digest headers can also be generated on responses:</p>
+<pre><code class="language-java">new JettyComponent().enableDigestFields(&quot;sha-256&quot;)
+</code></pre>
+<hr />
+<h2><a href="#authentication-and-authorization" id="authentication-and-authorization">Authentication and authorization</a></h2>
+<p>See the dedicated <a href="authentication.html">Authentication guide</a> for:</p>
+<ul>
+<li>Session-based authentication (<code>SessionBackend</code>)</li>
+<li>Token-based authentication (<code>TokenBackend</code>)</li>
+<li>Custom backend implementations</li>
+<li>Role-based access control with <code>PermissionPredicate</code></li>
+</ul>
+<hr />
+<h2><a href="#defense-in-depth-checklist" id="defense-in-depth-checklist">Defense-in-depth checklist</a></h2>
+<p>Compose multiple middlewares for layered protection:</p>
+<pre><code class="language-java">// Typical middleware stack (outer → inner)
+app.use(new ForwardedMiddleware());          // trust reverse proxy headers
+app.use(new CspNonceMiddleware());           // generate nonce BEFORE SecurityHeaders writes CSP
+app.use(new SecurityHeadersMiddleware());    // HSTS, CSP (nonce is injected by CspNonceMiddleware)
+app.use(new FetchMetadataMiddleware());      // block cross-origin abuse
+app.use(new CorsMiddleware());               // allow legitimate cross-origin APIs
+app.use(new SessionMiddleware());
+app.use(new AntiForgeryMiddleware());        // CSRF token check
+app.use(new AuthenticationMiddleware(...)); // identify the user
+// ... routing and controller invocation
+</code></pre>
+
+        </div>
+      </div>
+    </section>
+  </div>
+  </div>
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 offset-lg-8 text-end">
+            © 2016–2026 kawasima<br/>
+            Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
+  </body>
+</html>

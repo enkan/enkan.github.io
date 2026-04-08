@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset=utf-8"/>
+    <title>GraalVM Native Image &amp; CRaC | Enkan</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="../css/enkan.css" type="text/css"/>
+  </head>
+  <body id="page-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+          <img src="../img/logo.png" alt="enkan logo" class="navbar-logo">enkan
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bs-navbar-collapse-1" aria-controls="bs-navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../getting-started.html">Docs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/enkan/enkan">GitHub</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  <div class="container">
+  <div class="row">
+    <aside class="col-lg-2">
+<nav id="sidebar-wrapper" class="hidden-print hidden-xs hidden-sm">
+  <h3>Quick Start</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../getting-started.html">
+        Getting Started
+      </a>
+    </li>
+  </ul>
+
+  <h3>Guide</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../guide/why-enkan.html">
+        Why enkan?
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/repl.html">
+        REPL-Driven Development
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/enkan-system.html">
+        Enkan system
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/application-factory.html">
+        Application factory
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/controller.html">
+        Controller
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/content-negotiation.html">
+        Content negotiation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/session.html">
+        Session
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/conversation.html">
+        Conversation
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/authentication.html">
+        Authentication
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/file-uploading.html">
+        File uploading
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/development.html">
+        Development tools
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/testing.html">
+        Testing
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/deployment.html">
+        Deployment
+      </a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../guide/spring-boot-comparison.html">
+        Spring Boot Comparison
+      </a>
+    </li>
+  </ul>
+
+  <h3>Reference</h3>
+  <ul class="sidebar-nav">
+    <li class="sidebar-brand">
+      <a href="../reference/middlewares.html">Middleware</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/components.html">Components</a>
+    </li>
+    <li class="sidebar-brand">
+      <a href="../reference/repl.html">REPL commands</a>
+    </li>
+  </ul>
+</nav>
+    </aside>
+    <section class="col-lg-10">
+      <div class="row">
+        <div class="col-12">
+        <h1><a href="#graalvm-native-image-crac" id="graalvm-native-image-crac">GraalVM Native Image &amp; CRaC</a></h1>
+<p>Enkan supports two approaches to fast startup: GraalVM Native Image (compile to<br />
+a native binary) and CRaC (Checkpoint/Restore in Userspace). Both eliminate JVM<br />
+warm-up time; Native Image also reduces memory footprint, while CRaC can restore<br />
+a fully warmed-up JVM in milliseconds.</p>
+<hr />
+<h2><a href="#graalvm-native-image" id="graalvm-native-image">GraalVM Native Image</a></h2>
+<p>The <code>kotowari-graalvm</code> module provides two GraalVM<br />
+<a href="https://www.graalvm.org/sdk/javadoc/org/graalvm/nativeimage/hosted/Feature.html">Feature</a><br />
+implementations that automate the reflection configuration required for a native build.</p>
+<table>
+<thead>
+<tr><th> Feature </th><th> Role </th></tr>
+</thead>
+<tbody>
+<tr><td> <code>EnkanFeature</code> </td><td> Registers components, <code>MixinUtils</code>-generated classes, and SPI implementations </td></tr>
+<tr><td> <code>KotowariFeature</code> </td><td> Registers controllers, parameter types, return types, and generates a reflection-free dispatcher </td></tr>
+</tbody>
+</table>
+<h3><a href="#add-the-dependency" id="add-the-dependency">Add the dependency</a></h3>
+<pre><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;net.unit8.enkan&lt;/groupId&gt;
+  &lt;artifactId&gt;kotowari-graalvm&lt;/artifactId&gt;
+  &lt;version&gt;0.15.0&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<h3><a href="#configure-native-imageproperties" id="configure-native-imageproperties">Configure <code>native-image.properties</code></a></h3>
+<p>Place the following in<br />
+<code>src/main/resources/META-INF/native-image/&lt;groupId&gt;/&lt;artifactId&gt;/native-image.properties</code>:</p>
+<pre><code class="language-properties">Args = --features=enkan.graalvm.EnkanFeature,kotowari.graalvm.KotowariFeature \
+       --initialize-at-build-time=enkan.util.MixinUtils,kotowari.graalvm.NativeDispatcherRegistry,kotowari.graalvm.KotowariDispatcher \
+       -H:+ReportExceptionStackTraces
+</code></pre>
+<h3><a href="#pre-generate-mixin-classes-recommended" id="pre-generate-mixin-classes-recommended">Pre-generate mixin classes (recommended)</a></h3>
+<p>The <code>GenerateMixinConfig</code> tool writes <code>$Mixin</code> class files and their<br />
+<code>reflect-config.json</code> entries at Maven <code>prepare-package</code> time, so they are<br />
+included in the fat JAR before <code>native-image</code> runs:</p>
+<pre><code class="language-xml">&lt;plugin&gt;
+  &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+  &lt;artifactId&gt;exec-maven-plugin&lt;/artifactId&gt;
+  &lt;executions&gt;
+    &lt;execution&gt;
+      &lt;id&gt;generate-mixin-config&lt;/id&gt;
+      &lt;phase&gt;prepare-package&lt;/phase&gt;
+      &lt;goals&gt;&lt;goal&gt;java&lt;/goal&gt;&lt;/goals&gt;
+      &lt;configuration&gt;
+        &lt;mainClass&gt;kotowari.example.graalvm.GenerateMixinConfig&lt;/mainClass&gt;
+      &lt;/configuration&gt;
+    &lt;/execution&gt;
+  &lt;/executions&gt;
+&lt;/plugin&gt;
+</code></pre>
+<p>See <code>kotowari-graalvm-example</code> for a complete working example using Undertow + Jackson.</p>
+<h3><a href="#build-the-native-image" id="build-the-native-image">Build the native image</a></h3>
+<pre><code class="language-bash">mvn -Pnative package
+</code></pre>
+<p>The resulting binary starts in single-digit milliseconds and uses a fraction of<br />
+the heap required by the JVM version.</p>
+<blockquote>
+<p><strong>Preview API note:</strong> If your application uses <code>RequestTimeoutMiddleware</code><br />
+(which relies on <code>StructuredTaskScope</code>, a preview API), add<br />
+<code>--enable-preview</code> to both the <code>native-image</code> build arguments and the<br />
+runtime invocation of the binary.</p>
+</blockquote>
+<h3><a href="#what-the-features-do-automatically" id="what-the-features-do-automatically">What the features do automatically</a></h3>
+<p><strong><code>EnkanFeature</code>:</strong><br />
+- Registers all <code>@Inject</code>-annotated fields (including superclass hierarchy) for reflection<br />
+- Generates hidden-class <code>ComponentBinder</code> instances for reflection-free field injection<br />
+- Registers all <code>META-INF/services</code> SPI implementations</p>
+<p><strong><code>KotowariFeature</code>:</strong><br />
+- Calls <code>MixinUtils.createFactory()</code> at build time so all <code>$Mixin</code> subclasses exist in the image<br />
+- Registers all <code>$Mixin</code> classes for reflection<br />
+- Registers controller classes, their methods, and all parameter / return types<br />
+- Generates a <code>KotowariDispatcher</code> class that replaces reflective controller dispatch with<br />
+direct <code>invokevirtual</code> bytecode — zero reflection at runtime</p>
+<hr />
+<h2><a href="#crac-checkpointrestore-in-userspace" id="crac-checkpointrestore-in-userspace">CRaC (Checkpoint/Restore in Userspace)</a></h2>
+<p>CRaC takes a snapshot of a running JVM process (checkpoint) and restores it<br />
+later — potentially on a different host — with the JVM already warmed up. Enkan<br />
+integrates via the <code>org.crac</code> portability shim, so the same code runs on both<br />
+CRaC-capable JVMs and standard JVMs.</p>
+<h3><a href="#register-with-the-crac-context" id="register-with-the-crac-context">Register with the CRaC context</a></h3>
+<p>Call <code>registerCrac()</code> <strong>after</strong> <code>system.start()</code>:</p>
+<pre><code class="language-java">EnkanSystem system = EnkanSystem.of(
+    &quot;app&quot;,  new ApplicationComponent(AppFactory.class.getName()),
+    &quot;http&quot;, new JettyComponent()
+).relationships(
+    component(&quot;http&quot;).using(&quot;app&quot;)
+);
+
+system.start();
+system.registerCrac(); // opt-in; no-op on non-CRaC JVMs
+</code></pre>
+<p><code>registerCrac()</code> registers a <code>Resource</code> that:<br />
+- Calls <code>system.stop()</code> before the checkpoint is taken (closes sockets, flushes state)<br />
+- Calls <code>system.start()</code> after restore (re-opens sockets, reconnects to databases)</p>
+<p>A second overload accepts an explicit <code>Context&lt;Resource&gt;</code> for testing:</p>
+<pre><code class="language-java">system.registerCrac(Core.getGlobalContext()); // default
+system.registerCrac(myTestContext);           // for unit tests
+</code></pre>
+<h3><a href="#take-a-checkpoint" id="take-a-checkpoint">Take a checkpoint</a></h3>
+<p>With a CRaC-enabled JDK (e.g., Azul Zulu CRaC or OpenJDK CRaC builds):</p>
+<pre><code class="language-bash"># Start your application
+java -XX:CRaCCheckpointTo=/tmp/checkpoint -jar myapp.jar
+
+# In another terminal, trigger the checkpoint
+jcmd &lt;pid&gt; JDK.checkpoint
+</code></pre>
+<h3><a href="#restore" id="restore">Restore</a></h3>
+<pre><code class="language-bash">java -XX:CRaCRestoreFrom=/tmp/checkpoint
+</code></pre>
+<p>The application is running immediately — no JVM startup, no JIT warm-up.</p>
+<h3><a href="#behaviour-on-non-crac-jvms" id="behaviour-on-non-crac-jvms">Behaviour on non-CRaC JVMs</a></h3>
+<p>The <code>org.crac</code> portability shim absorbs <code>registerCrac()</code> silently. No exception<br />
+is thrown; the method is a no-op. The same binary runs on both CRaC and standard<br />
+JVMs.</p>
+<h3><a href="#limitations" id="limitations">Limitations</a></h3>
+<ul>
+<li>File descriptors (sockets, database connections) are closed at checkpoint and<br />
+re-opened at restore. Connection pools (HikariCP) restart cleanly via the<br />
+component lifecycle.</li>
+<li>Do not checkpoint with open WebSocket connections or active SSE streams.</li>
+<li>CRaC snapshots are JVM-version-specific; snapshots cannot be shared across<br />
+different JDK versions.</li>
+</ul>
+<hr />
+<h2><a href="#choosing-between-native-image-and-crac" id="choosing-between-native-image-and-crac">Choosing between Native Image and CRaC</a></h2>
+<table>
+<thead>
+<tr><th> </th><th> GraalVM Native Image </th><th> CRaC </th></tr>
+</thead>
+<tbody>
+<tr><td> Startup time </td><td> Single-digit ms (cold) </td><td> Near-zero (warm restore) </td></tr>
+<tr><td> Memory footprint </td><td> Significantly reduced </td><td> Same as JVM </td></tr>
+<tr><td> JIT optimization </td><td> AOT (profile-guided optional) </td><td> Full JIT after restore </td></tr>
+<tr><td> Build complexity </td><td> High (reflection config, native-image) </td><td> Low (standard JVM build) </td></tr>
+<tr><td> Best for </td><td> Serverless, CLI tools, short-lived containers </td><td> Long-running services, scale-to-zero </td></tr>
+</tbody>
+</table>
+
+        </div>
+      </div>
+    </section>
+  </div>
+  </div>
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 offset-lg-8 text-end">
+            © 2016–2026 kawasima<br/>
+            Documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
+  </body>
+</html>
